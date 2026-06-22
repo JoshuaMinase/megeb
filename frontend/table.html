@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — Menu Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #f8f6f2; }
+    .page { max-width: 900px; margin: 0 auto; padding: 110px 24px 80px; }
+    h1 { font-family: 'Times New Roman',serif; font-size: 2.4rem; color: #263020; margin-bottom: 8px; }
+    .subtitle { font-family: Georgia,serif; font-size: 15px; color: #888; margin-bottom: 40px; line-height: 1.6; }
+
+    /* Slot grid */
+    .slots { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+    @media(max-width:600px) { .slots { grid-template-columns: 1fr; } }
+
+    .slot {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.06);
+      padding: 20px 24px; position: relative;
+    }
+    .slot-label {
+      font-size: 11px; letter-spacing: 1px; color: #aaa; font-family: Georgia,serif;
+      margin-bottom: 10px; display: block;
+    }
+    .slot-label span { color: #FF9124; }
+
+    /* Search input */
+    .slot-search { position: relative; }
+    .slot-search input {
+      width: 100%; padding: 11px 14px; border: 2px solid #e8e8e8;
+      border-radius: 10px; font-size: 15px; font-family: Georgia,serif; color: #263020;
+      outline: none; transition: border-color .25s;
+    }
+    .slot-search input:focus { border-color: #FF9124; }
+    .slot-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+      border: 2px solid #FF9124; border-top: none; border-radius: 0 0 10px 10px;
+      z-index: 50; max-height: 200px; overflow-y: auto; display: none;
+    }
+    .slot-dropdown.open { display: block; }
+    .slot-option { padding: 11px 14px; cursor: pointer; font-family: Georgia,serif; font-size: 14px; color: #263020; border-bottom: 1px solid #f0f0f0; }
+    .slot-option:hover { background: #fff8f0; }
+    .slot-option small { color: #aaa; font-size: 12px; margin-left: 6px; }
+
+    /* Selected dish chip in slot */
+    .slot-picked {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff8f0; border: 2px solid #FF9124; border-radius: 10px; padding: 10px 14px;
+    }
+    .slot-picked img { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+    .slot-picked-info { flex: 1; min-width: 0; }
+    .slot-picked-info strong { font-family: 'Times New Roman',serif; font-size: 15px; color: #263020; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .slot-picked-info small { font-family: Georgia,serif; font-size: 12px; color: #aaa; }
+    .slot-clear { background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer; flex-shrink: 0; line-height: 1; }
+    .slot-clear:hover { color: #FF9124; }
+
+    /* Table display */
+    .table-display {
+      background: #fff; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,.07);
+      padding: 32px 36px; margin-bottom: 32px; display: none;
+    }
+    .table-display.has-items { display: block; }
+    .table-display h2 { font-family: 'Times New Roman',serif; font-size: 1.6rem; color: #263020; margin-bottom: 20px; }
+    .table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .table-dish {
+      text-align: center; cursor: pointer;
+      transition: transform .2s;
+    }
+    .table-dish:hover { transform: translateY(-4px); }
+    .table-dish img { width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-bottom: 8px; }
+    .table-dish-name { font-family: 'Times New Roman',serif; font-size: 14px; color: #263020; }
+    .table-dish-role { font-family: Georgia,serif; font-size: 11px; color: #aaa; letter-spacing: .5px; }
+    .table-summary {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      border-top: 1px solid #f0f0f0; padding-top: 20px;
+      font-family: Georgia,serif; font-size: 14px; color: #666;
+    }
+    .table-summary span strong { color: #263020; }
+
+    /* Action buttons */
+    .actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-share {
+      padding: 13px 28px; background: #FF9124; color: #fff; border: none;
+      border-radius: 12px; cursor: pointer; font-family: 'Times New Roman',serif; font-size: 16px;
+      transition: background .2s;
+    }
+    .btn-share:hover { background: #263020; }
+    .btn-clear-all {
+      padding: 13px 28px; background: none; color: #888; border: 2px solid #e8e8e8;
+      border-radius: 12px; cursor: pointer; font-family: Georgia,serif; font-size: 14px;
+      transition: all .2s;
+    }
+    .btn-clear-all:hover { border-color: #FF9124; color: #FF9124; }
+
+    .share-url-box {
+      background: #f0f8f0; border: 1px solid #c3e6cb; border-radius: 10px;
+      padding: 14px 18px; margin-top: 16px; display: none;
+      font-family: Georgia,serif; font-size: 13px; color: #263020;
+    }
+    .share-url-box.show { display: block; }
+    .share-url-box input { width: 100%; border: none; background: transparent; font-family: monospace; font-size: 13px; color: #263020; outline: none; margin-top: 4px; }
+
+    .future-note { background: #fff8e6; border-left: 4px solid #FF9124; border-radius: 0 10px 10px 0; padding: 12px 16px; font-family: Georgia,serif; font-size: 13px; color: #856404; margin-top: 32px; }
+  </style>
+</head>
+<body>
+
+  <header style="position:fixed;background:rgba(255,255,255,.97);padding:15px 60px;box-shadow:0 2px 20px rgba(0,0,0,.06);z-index:100;">
+    <a href="index.html"><img src="images/logo-dark.png" alt="Megeb" style="height:32px;"></a>
+    <nav>
+      <a href="foods.html" style="color:#263020;">← Back to Foods</a>
+      <a href="index.html" style="color:#263020;">Home</a>
+      <a href="#" id="nav-logout" onclick="logout()" style="color:#FF9124;display:none;">Logout</a>
+    </nav>
+  </header>
+
+  <div class="page">
+    <h1>🍽 Menu Builder</h1>
+    <p class="subtitle">
+      Plan an Ethiopian shared-plate spread. Pick a main, sides, and injera — then share the table with a link.
+    </p>
+
+    <!-- Slots -->
+    <div class="slots" id="slots-container"></div>
+
+    <!-- Table preview -->
+    <div class="table-display" id="table-display">
+      <h2>Your Table</h2>
+      <div class="table-grid" id="table-grid"></div>
+      <div class="table-summary" id="table-summary"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn-share" onclick="shareTable()">🔗 Share This Table</button>
+      <button class="btn-clear-all" onclick="clearAll()">✕ Clear All</button>
+    </div>
+    <div class="share-url-box" id="share-box">
+      <strong>📋 Shareable link — copy and send:</strong><br>
+      <input type="text" id="share-url" readonly onclick="this.select()">
+    </div>
+
+    <p class="future-note">
+      💡 <strong>Coming later:</strong> Save your table to your profile. For now the link captures everything — bookmark it or share it directly.
+    </p>
+  </div>
+
+  <footer>
+    <div class="footer-background">
+      <div class="footer-overlay">
+        <div class="footer-logo"><img src="images/logo-white.png" alt="Megeb"></div>
+        <div class="footer-grid">
+          <div><h3>Megeb</h3>Ancient dishes, Modern Kitchen.</div>
+          <div>
+            <h3>Explore</h3>
+            <a href="index.html">Home</a><br>
+            <a href="foods.html">Foods</a><br>
+            <a href="table.html">Menu Builder</a>
+          </div>
+          <div><h3>The Studio</h3>Bole Atlas, Addis Ababa<br>hello@megeb.com</div>
+        </div>
+        <div class="footer-bottom"><small>&copy; 2024 Megeb — All Rights Reserved.</small></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    updateNav();
+
+    // Slot definitions
+    const SLOTS = [
+      { key: 'main',   label: 'MAIN DISH', required: false },
+      { key: 'side1',  label: 'SIDE DISH 1', required: false },
+      { key: 'side2',  label: 'SIDE DISH 2', required: false },
+      { key: 'side3',  label: 'SIDE DISH 3', required: false },
+      { key: 'injera', label: 'INJERA / BREAD', required: false },
+      { key: 'drink',  label: 'DRINK / EXTRA', required: false },
+    ];
+
+    let selections = {};   // { key: dishObject }
+    let allDishes   = [];  // cached dish list
+    let searchTimers = {};
+
+    // Load all dishes once for autocomplete
+    fetchDishes({ limit: 100 }).then(data => {
+      allDishes = data.dishes || [];
+      renderSlots();
+      restoreFromURL();
+    }).catch(() => { renderSlots(); restoreFromURL(); });
+
+    function renderSlots() {
+      const container = document.getElementById('slots-container');
+      container.innerHTML = SLOTS.map(s => `
+        <div class="slot" id="slot-${s.key}">
+          <span class="slot-label">${s.label}</span>
+          <div class="slot-inner" id="inner-${s.key}"></div>
+        </div>`).join('');
+      SLOTS.forEach(s => renderSlotInner(s.key));
+    }
+
+    function renderSlotInner(key) {
+      const inner = document.getElementById(`inner-${key}`);
+      if (!inner) return;
+      const dish = selections[key];
+      if (dish) {
+        inner.innerHTML = `
+          <div class="slot-picked">
+            <img src="${dish.reference_image_url || 'images/food-doro.jpg'}" alt="${dish.name}" onerror="this.src='images/food-doro.jpg'">
+            <div class="slot-picked-info">
+              <strong>${dish.name}</strong>
+              <small>${dish.category || ''}</small>
+            </div>
+            <button class="slot-clear" onclick="clearSlot('${key}')" title="Remove">×</button>
+          </div>`;
+      } else {
+        inner.innerHTML = `
+          <div class="slot-search">
+            <input type="text" id="input-${key}" placeholder="Search dish…" autocomplete="off"
+              oninput="slotSearch('${key}', this.value)"
+              onfocus="slotSearch('${key}', this.value)">
+            <div class="slot-dropdown" id="dd-${key}"></div>
+          </div>`;
+      }
+      updateTableDisplay();
+    }
+
+    function slotSearch(key, q) {
+      clearTimeout(searchTimers[key]);
+      const dd = document.getElementById(`dd-${key}`);
+      if (!dd) return;
+      if (!q.trim()) { dd.classList.remove('open'); return; }
+
+      searchTimers[key] = setTimeout(() => {
+        const results = allDishes.filter(d =>
+          d.name.toLowerCase().includes(q.toLowerCase()) ||
+          (d.name_amharic || '').includes(q)
+        ).slice(0, 8);
+
+        if (!results.length) { dd.classList.remove('open'); return; }
+        dd.innerHTML = results.map(d =>
+          `<div class="slot-option" onclick="pickDish('${key}','${d.slug}')">
+            ${d.name}<small>${d.category || ''}</small>
+          </div>`
+        ).join('');
+        dd.classList.add('open');
+      }, 200);
+    }
+
+    function pickDish(key, slug) {
+      const dish = allDishes.find(d => d.slug === slug);
+      if (!dish) return;
+      selections[key] = dish;
+      document.getElementById(`dd-${key}`)?.classList.remove('open');
+      renderSlotInner(key);
+    }
+
+    function clearSlot(key) {
+      delete selections[key];
+      renderSlotInner(key);
+    }
+
+    function clearAll() {
+      selections = {};
+      SLOTS.forEach(s => renderSlotInner(s.key));
+      document.getElementById('share-box').classList.remove('show');
+    }
+
+    // ── Table display ─────────────────────────────────────────────────────────
+    function updateTableDisplay() {
+      const picked = SLOTS.map(s => ({ ...s, dish: selections[s.key] })).filter(s => s.dish);
+      const display = document.getElementById('table-display');
+
+      if (!picked.length) {
+        display.classList.remove('has-items');
+        return;
+      }
+      display.classList.add('has-items');
+
+      document.getElementById('table-grid').innerHTML = picked.map(s => `
+        <div class="table-dish" onclick="window.open('recipe.html?slug=${s.dish.slug}','_blank')">
+          <img src="${s.dish.reference_image_url || 'images/food-doro.jpg'}" alt="${s.dish.name}" onerror="this.src='images/food-doro.jpg'">
+          <div class="table-dish-name">${s.dish.name}</div>
+          <div class="table-dish-role">${s.label}</div>
+        </div>`).join('');
+
+      // Combined time — sum all dishes that have variations loaded (best-effort: we use dish metadata)
+      const totalPrep = picked.reduce((sum, s) => sum + (s.dish.total_prep || 0), 0);
+      const totalCook = picked.reduce((sum, s) => sum + (s.dish.total_cook || 0), 0);
+      const summary = document.getElementById('table-summary');
+      summary.innerHTML = `
+        <span>🍽 <strong>${picked.length}</strong> dish${picked.length !== 1 ? 'es' : ''}</span>
+        ${totalPrep ? `<span>⏱ Est. prep: <strong>${totalPrep} min</strong></span>` : ''}
+        ${totalCook ? `<span>🍳 Est. cook: <strong>${totalCook} min</strong></span>` : ''}
+      `;
+    }
+
+    // ── Share URL ─────────────────────────────────────────────────────────────
+    function shareTable() {
+      const slugs = SLOTS.map(s => selections[s.key]?.slug).filter(Boolean);
+      if (!slugs.length) { showToast('Pick at least one dish first!', 'info'); return; }
+
+      const url = `${location.origin}${location.pathname}?table=${slugs.join(',')}`;
+      document.getElementById('share-url').value = url;
+      document.getElementById('share-box').classList.add('show');
+
+      navigator.clipboard?.writeText(url).then(() => showToast('Link copied to clipboard!', 'success')).catch(() => {});
+    }
+
+    // ── Restore from URL ?table=slug1,slug2 ───────────────────────────────────
+    function restoreFromURL() {
+      const param = new URLSearchParams(location.search).get('table');
+      if (!param) return;
+      const slugs = param.split(',').filter(Boolean);
+      const slotKeys = SLOTS.map(s => s.key);
+      slugs.forEach((slug, i) => {
+        if (i >= slotKeys.length) return;
+        const dish = allDishes.find(d => d.slug === slug);
+        if (dish) { selections[slotKeys[i]] = dish; renderSlotInner(slotKeys[i]); }
+      });
+    }
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.slot-search')) {
+        document.querySelectorAll('.slot-dropdown').forEach(d => d.classList.remove('open'));
+      }
+    });
+  </script>
+</body>
+</html>

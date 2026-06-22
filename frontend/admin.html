@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background:#f8f6f2; }
+    .page-wrap { max-width:900px; margin:0 auto; padding:110px 24px 80px; }
+
+    h1 { font-family:'Times New Roman',serif; font-size:36px; color:#263020; margin-bottom:6px; }
+    .subtitle { font-family:Georgia,serif; font-size:15px; color:#999; margin-bottom:40px; }
+
+    .section-head {
+      display:flex; justify-content:space-between; align-items:center;
+      margin:40px 0 16px;
+    }
+    .section-head h2 { font-family:'Times New Roman',serif; font-size:22px; color:#263020; }
+    .count-badge { background:#FF9124; color:#fff; border-radius:20px; padding:3px 12px; font-size:13px; font-family:Georgia,serif; }
+
+    .queue-empty { font-family:Georgia,serif; color:#bbb; padding:30px 0; text-align:center; }
+
+    /* Item card */
+    .queue-item {
+      background:#fff; border-radius:14px; padding:20px 24px;
+      box-shadow:0 2px 12px rgba(0,0,0,.07); margin-bottom:14px;
+      display:flex; gap:20px; align-items:flex-start;
+    }
+    .queue-item img {
+      width:80px; height:80px; object-fit:cover; border-radius:10px; flex-shrink:0;
+    }
+    .queue-item-body { flex:1; min-width:0; }
+    .queue-item-body h3 { font-family:'Times New Roman',serif; font-size:18px; color:#263020; margin-bottom:4px; }
+    .queue-item-body .meta { font-family:Georgia,serif; font-size:13px; color:#aaa; margin-bottom:8px; }
+    .queue-item-body .desc { font-family:Georgia,serif; font-size:14px; color:#666; line-height:1.5;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:500px; }
+    .queue-actions { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+
+    .btn-approve {
+      padding:8px 22px; border-radius:8px; border:none;
+      background:#263020; color:#fff; cursor:pointer;
+      font-family:Georgia,serif; font-size:14px; transition:background .2s;
+    }
+    .btn-approve:hover { background:#1a2015; }
+
+    .btn-reject {
+      padding:8px 22px; border-radius:8px;
+      border:2px solid #e0e0e0; background:#fff; color:#c0392b;
+      cursor:pointer; font-family:Georgia,serif; font-size:14px; transition:all .2s;
+    }
+    .btn-reject:hover { border-color:#c0392b; background:#fff0f0; }
+
+    .btn-approve:disabled, .btn-reject:disabled { opacity:.4; cursor:not-allowed; }
+
+    .done-chip {
+      display:inline-block; padding:4px 14px; border-radius:20px;
+      font-family:Georgia,serif; font-size:13px;
+    }
+    .done-chip.approved { background:#e8f5e9; color:#2e7d32; }
+    .done-chip.rejected { background:#fff0f0; color:#c0392b; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:8px; border-bottom:2px solid #eee; }
+    .tab {
+      padding:10px 22px; cursor:pointer; font-family:Georgia,serif; font-size:15px;
+      color:#999; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s;
+    }
+    .tab.active { color:#263020; border-bottom-color:#FF9124; font-weight:600; }
+
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* Access denied */
+    .denied { text-align:center; padding:120px 20px; font-family:Georgia,serif; }
+    .denied h2 { font-size:32px; color:#263020; margin-bottom:12px; }
+    .denied p { color:#999; margin-bottom:24px; }
+    .denied a { color:#FF9124; }
+  </style>
+</head>
+<body>
+
+  <header style="position:fixed;background:rgba(255,255,255,.97);padding:15px 60px;box-shadow:0 2px 20px rgba(0,0,0,.06);z-index:100;">
+    <a href="index.html"><img src="images/logo-dark.png" alt="Megeb" style="height:32px;"></a>
+    <nav>
+      <a href="foods.html" style="color:#263020;">← Foods</a>
+      <a href="#" id="nav-logout" onclick="logout()" style="color:#FF9124;display:none;">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Access denied state -->
+  <div class="denied" id="denied" style="display:none;">
+    <h2>Admin only</h2>
+    <p>You need an admin account to view this page.</p>
+    <a href="index.html">← Go home</a>
+  </div>
+
+  <div class="page-wrap" id="admin-wrap" style="display:none;">
+    <h1>Moderation Queue</h1>
+    <p class="subtitle" id="queue-summary">Loading…</p>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('dishes')">🍲 Dishes <span id="dish-count-tab"></span></div>
+      <div class="tab" onclick="switchTab('variations')">🧑‍🍳 Variations <span id="var-count-tab"></span></div>
+    </div>
+
+    <div class="tab-panel active" id="panel-dishes"></div>
+    <div class="tab-panel" id="panel-variations"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const user = getUser();
+
+    if (!user) {
+      window.location.href = 'login.html?next=admin.html';
+    } else if (user.role !== 'admin') {
+      document.getElementById('denied').style.display = 'block';
+      updateNav();
+    } else {
+      document.getElementById('admin-wrap').style.display = 'block';
+      updateNav();
+      loadQueue();
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['dishes','variations'][i] === name));
+      document.getElementById('panel-dishes').classList.toggle('active', name === 'dishes');
+      document.getElementById('panel-variations').classList.toggle('active', name === 'variations');
+    }
+
+    async function loadQueue() {
+      try {
+        const data = await moderationQueue();
+        const dishes = data.dishes || [];
+        const vars   = data.variations || [];
+
+        const total = dishes.length + vars.length;
+        document.getElementById('queue-summary').textContent =
+          total ? `${total} item${total>1?'s':''} waiting for review` : 'All clear — nothing pending.';
+
+        document.getElementById('dish-count-tab').innerHTML = dishes.length ? `<span class="count-badge">${dishes.length}</span>` : '';
+        document.getElementById('var-count-tab').innerHTML  = vars.length   ? `<span class="count-badge">${vars.length}</span>`   : '';
+
+        document.getElementById('panel-dishes').innerHTML    = dishes.length ? dishes.map(dishCard).join('') : '<p class="queue-empty">No pending dishes.</p>';
+        document.getElementById('panel-variations').innerHTML = vars.length  ? vars.map(varCard).join('')    : '<p class="queue-empty">No pending variations.</p>';
+      } catch(e) {
+        document.getElementById('queue-summary').textContent = 'Failed to load queue.';
+      }
+    }
+
+    function dishCard(d) {
+      const img = d.reference_image_url || 'images/food-doro.jpg';
+      return `
+        <div class="queue-item" id="dish-${d.id}">
+          <img src="${img}" onerror="this.src='images/food-doro.jpg'" alt="${d.name}">
+          <div class="queue-item-body">
+            <h3>${d.name}${d.name_amharic ? ` <small style="color:#aaa;font-size:14px;">${d.name_amharic}</small>` : ''}</h3>
+            <div class="meta">${d.category || '—'} ${d.region ? '· ' + d.region : ''} · submitted by user</div>
+            <div class="desc">${d.description || ''}</div>
+            <div class="queue-actions">
+              <button class="btn-approve" onclick="act('dish','${d.id}','approve')">✓ Approve</button>
+              <button class="btn-reject"  onclick="act('dish','${d.id}','reject')">✕ Reject</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function varCard(v) {
+      const img = v.image_url || 'images/food-doro.jpg';
+      const ings = (v.ingredients || []).slice(0, 4).join(', ') + (v.ingredients?.length > 4 ? '…' : '');
+      return `
+        <div class="queue-item" id="var-${v.id}">
+          <img src="${img}" onerror="this.src='images/food-doro.jpg'" alt="${v.variation_name}">
+          <div class="queue-item-body">
+            <h3>${v.variation_name}</h3>
+            <div class="meta">dish_id: ${v.dish_id} · by ${v.author_name || 'unknown'} · 🌶 ${v.spice_level || '—'}</div>
+            <div class="desc">${ings || v.notes || ''}</div>
+            <div class="queue-actions">
+              <button class="btn-approve" onclick="act('variation','${v.id}','approve')">✓ Approve</button>
+              <button class="btn-reject"  onclick="act('variation','${v.id}','reject')">✕ Reject</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function act(type, id, action) {
+      const card = document.getElementById(`${type === 'dish' ? 'dish' : 'var'}-${id}`);
+      card.querySelectorAll('button').forEach(b => b.disabled = true);
+      try {
+        if (type === 'dish') await moderateDish(id, action);
+        else                 await moderateVariation(id, action);
+        const label = action === 'approve' ? 'approved' : 'rejected';
+        card.querySelector('.queue-actions').innerHTML = `<span class="done-chip ${label}">${label === 'approved' ? '✓ Approved' : '✕ Rejected'}</span>`;
+      } catch(e) {
+        card.querySelectorAll('button').forEach(b => b.disabled = false);
+      }
+    }
+  </script>
+</body>
+</html>

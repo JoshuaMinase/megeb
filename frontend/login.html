@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — Log In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #f8f6f2; min-height: 100vh; display: flex; flex-direction: column; }
+    .auth-page { flex: 1; display: flex; align-items: center; justify-content: center; padding: 100px 20px 60px; }
+    .auth-card { background: #fff; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,.08); padding: 50px 44px; width: 100%; max-width: 440px; }
+    .auth-card h1 { font-size: 36px; color: #263020; margin-bottom: 6px; }
+    .auth-card .sub { color: #888; font-family: Georgia,serif; font-size: 15px; margin-bottom: 36px; }
+    .form-group { margin-bottom: 22px; }
+    .form-group label { display: block; font-size: 12px; letter-spacing: 1px; color: #555; margin-bottom: 7px; font-family: Georgia,serif; }
+    .form-group input { width: 100%; padding: 13px 16px; border: 2px solid #e8e8e8; border-radius: 10px; font-size: 16px; font-family: Georgia,serif; color: #263020; outline: none; transition: border-color .3s; }
+    .form-group input:focus { border-color: #FF9124; }
+    .submit-btn { width: 100%; padding: 16px; background: #FF9124; color: #fff; border: none; border-radius: 12px; font-size: 17px; font-family: 'Times New Roman',serif; cursor: pointer; transition: background .3s; margin-top: 10px; }
+    .submit-btn:hover { background: #263020; }
+    .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+    .auth-link { text-align: center; margin-top: 22px; font-family: Georgia,serif; font-size: 14px; color: #888; }
+    .auth-link a { color: #FF9124; text-decoration: none; font-weight: bold; }
+    .error-msg { background: #fff0f0; color: #c0392b; border-radius: 8px; padding: 12px 16px; font-size: 14px; margin-bottom: 18px; display: none; font-family: Georgia,serif; }
+    .error-msg.show { display: block; }
+    .hero-quote { text-align: center; font-style: italic; font-family:'Times New Roman',serif; font-size: 18px; color: #aaa; margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+  <header style="position:fixed; background:rgba(255,255,255,.97); padding:15px 60px; box-shadow:0 2px 20px rgba(0,0,0,.07);">
+    <a href="index.html">
+      <img src="images/logo-dark.png" alt="Megeb" style="height:32px;">
+    </a>
+    <nav>
+      <a href="index.html" style="color:#263020;">Home</a>
+      <a href="foods.html" style="color:#263020;">Foods</a>
+      <a href="pantry.html" style="color:#263020;">Pantry</a>
+      <a href="signup.html" style="color:#FF9124;">Sign Up</a>
+    </nav>
+  </header>
+
+  <div class="auth-page">
+    <div class="auth-card">
+      <h1>Welcome Back</h1>
+      <p class="sub">Log in to share recipes and get personalised recommendations.</p>
+
+      <div class="error-msg" id="error-msg"></div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>EMAIL</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>PASSWORD</label>
+          <input type="password" id="password" placeholder="Your password" required>
+        </div>
+        <button type="submit" class="submit-btn" id="submit-btn">Log In</button>
+      </form>
+
+      <div class="auth-link">New here? <a href="signup.html">Create a free account</a></div>
+      <p class="hero-quote">"Cooking is love made visible."</p>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (isLoggedIn()) window.location.href = 'foods.html';
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('error-msg');
+      errEl.classList.remove('show');
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Logging in...';
+
+      try {
+        await login(
+          document.getElementById('email').value.trim(),
+          document.getElementById('password').value
+        );
+        const redirect = new URLSearchParams(window.location.search).get('next') || 'foods.html';
+        window.location.href = redirect;
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Log In';
+      }
+    }
+  </script>
+</body>
+</html>

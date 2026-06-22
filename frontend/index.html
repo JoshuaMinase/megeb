@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header>
+    <a href="index.html">
+      <img src="images/logo-white.png" alt="Megeb"
+           data-logo-white="images/logo-white.png"
+           data-logo-dark="images/logo-dark.png">
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="foods.html">Foods</a>
+      <a href="pantry.html">Pantry</a>
+      <a href="table.html">Menu Builder</a>
+      <a href="add-recipe.html" id="nav-add" style="display:none">+ Add Recipe</a>
+      <a href="signup.html" id="nav-login">Sign Up</a>
+      <a href="#" id="nav-logout" style="display:none" onclick="logout()">
+        <span id="nav-username"></span> &middot; Logout
+      </a>
+    </nav>
+  </header>
+
+  <!-- ═══ ZETTA-JOULE STYLE HERO ═══ -->
+  <section class="zj-hero">
+    <div class="zj-hero-bg"></div>
+    <div class="zj-hero-overlay"></div>
+    <div class="zj-hero-inner">
+      <div class="zj-hero-text">
+        <p class="zj-hero-tag">Ethiopian Cuisine</p>
+        <h1 class="zj-hero-title zj-reveal-hero">Create<br>the <span>Taste</span></h1>
+        <p class="zj-hero-sub">Ancient recipes, modern kitchen — discover the heart of Ethiopian cooking</p>
+        <div class="zj-hero-actions">
+          <div class="zj-hero-search" id="hero-search-wrap">
+            <input type="text" placeholder="What's in your fridge? Ask AI for a recipe…" id="hero-search-input">
+            <button id="hero-search-btn" onclick="handleSearch()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="hero-ai-result"></div>
+      </div>
+      <div class="zj-hero-visual zj-reveal-hero-delay">
+        <div class="zj-hero-img-wrap">
+          <img src="images/hero-1.png" alt="Ethiopian Dish">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ABOUT / MISSION (split layout like zetta-joule) ═══ -->
+  <section class="zj-section">
+    <div class="zj-section-inner">
+      <div class="zj-text-block zj-reveal">
+        <span class="zj-tag">The Name Reflects our Mission</span>
+        <h2>Ancient Dishes,<br>Modern Kitchen</h2>
+        <p>Megeb is dedicated to preserving the soul of Ethiopian cooking for the modern home chef. From the highlands to your table, we bring you simple, delicious recipes made with warmth, tradition, and real home-style flavour.</p>
+        <a href="foods.html" class="zj-btn">Explore Our Recipes</a>
+      </div>
+      <div class="zj-visual-block zj-reveal-delay">
+        <img src="images/food-photo-1.png" alt="Traditional Ethiopian food">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ROTATING BANNER (kept from original) ═══ -->
+  <div class="banner-wrapper zj-reveal">
+    <div class="bannerbox">
+      <div class="banner-track">
+        <div class="bannertext">
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+        <div class="bannertext">
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+          <h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FEATURES GRID (like Heat / Heat & Power / Hydrogen / Electricity) ═══ -->
+  <section class="zj-features">
+    <div class="zj-section-header zj-reveal">
+      <span class="zj-tag">What We Offer</span>
+      <h2>Designed for<br>Every Kitchen</h2>
+    </div>
+    <div class="zj-features-grid">
+      <div class="zj-feature-card zj-reveal" style="transition-delay:0ms;">
+        <div class="zj-feature-icon">🥘</div>
+        <h3>Traditional Recipes</h3>
+        <p>Authentic Ethiopian dishes passed down through generations, carefully documented for modern cooking.</p>
+      </div>
+      <div class="zj-feature-card zj-reveal" style="transition-delay:100ms;">
+        <div class="zj-feature-icon">🤖</div>
+        <h3>AI-Powered Suggestions</h3>
+        <p>Tell us what's in your fridge and our AI will suggest Ethiopian recipes you can make right now.</p>
+      </div>
+      <div class="zj-feature-card zj-reveal" style="transition-delay:200ms;">
+        <div class="zj-feature-icon">📋</div>
+        <h3>Smart Pantry</h3>
+        <p>Track your ingredients and never wonder what to cook again with your personalised pantry.</p>
+      </div>
+      <div class="zj-feature-card zj-reveal" style="transition-delay:300ms;">
+        <div class="zj-feature-icon">🍽️</div>
+        <h3>Menu Builder</h3>
+        <p>Plan complete Ethiopian feasts with our interactive menu builder — from appetisers to desserts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURED COLLECTIONS ═══ -->
+  <section class="zj-collections" id="collections-section" style="display:none;">
+    <div class="zj-section-header zj-reveal">
+      <span class="zj-tag">Curated Selections</span>
+      <h2>Featured <span>Collections</span></h2>
+    </div>
+    <div class="zj-collections-grid" id="collections-grid"></div>
+  </section>
+
+  <!-- ═══ SPLIT SECTION: Story (alternating layout) ═══ -->
+  <section class="zj-section zj-section-alt">
+    <div class="zj-section-inner">
+      <div class="zj-visual-block zj-reveal">
+        <img src="images/food-photo-2.png" alt="Ethiopian cooking">
+      </div>
+      <div class="zj-text-block zj-reveal-delay">
+        <span class="zj-tag">Our Story</span>
+        <h2>Passion on<br>Every Plate</h2>
+        <p>&ldquo;At Megeb, we celebrate the rich flavours and traditions of Ethiopian cuisine. Each recipe is inspired by the heart of our culture — from the fragrant spices of a hearty wot to the simple joy of fresh injera. We share these recipes so anyone can experience the warmth, comfort, and history that Ethiopian food brings to every table.&rdquo;</p>
+        <a href="foods.html" class="zj-btn">View All Recipes</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CTA SECTION (like zetta-joule's 24/7 Clean Energy) ═══ -->
+  <section class="zj-cta">
+    <div class="zj-cta-bg"></div>
+    <div class="zj-cta-overlay"></div>
+    <div class="zj-cta-content zj-reveal">
+      <h2>Ready to<br>Create the Taste?</h2>
+      <p>Join our community of home chefs exploring the rich flavours of Ethiopia. Sign up to save recipes, build your pantry, and get AI-powered suggestions.</p>
+      <a href="signup.html" class="zj-btn zj-btn-light">Get Started Free</a>
+    </div>
+  </section>
+
+  <!-- ═══ DECORATIVE QUOTE SECTION ═══ -->
+  <div class="box2-quote" id="about">
+    <div class="box2-images">
+      <img src="images/food-doro.jpg"   alt="Doro Wat" class="bimg bimg1">
+      <img src="images/food-tibs.jpg"   alt="Tibs"     class="bimg bimg2">
+      <img src="images/food-firfir.jpg" alt="Firfir"   class="bimg bimg3">
+    </div>
+    <div class="box2-text">
+      <div class="box2-line"></div>
+      <blockquote>&ldquo;The secret ingredient is always passion.&rdquo;</blockquote>
+    </div>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-background">
+      <div class="footer-overlay">
+        <div class="footer-logo">
+          <img src="images/logo-white.png" alt="Megeb">
+        </div>
+        <div class="footer-grid">
+          <div>
+            <h3>Megeb</h3>
+            Ancient dishes, Modern Kitchen. Megeb is dedicated to preserving the soul
+            of Ethiopian cooking for the modern home chef. From the highlands to your table.
+          </div>
+          <div>
+            <h3>Explore</h3>
+            <a href="index.html">Home</a><br>
+            <a href="foods.html">Foods</a><br>
+            <a href="pantry.html">My Pantry</a><br>
+            <a href="add-recipe.html">Add Recipe</a><br>
+            <a href="#about">About</a>
+          </div>
+          <div>
+            <h3>The Studio</h3>
+            Bole Atlas, Building, 4th Floor<br>
+            Addis Ababa, Ethiopia<br>
+            hello@megeb.com<br>
+            +251 911 123 456
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <small>&copy; 2024 Megeb &mdash; All Rights Reserved.</small>
+          Privacy Policy &bull; Terms of Service
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ai-widget.js"></script>
+  <script>
+    updateNav();
+
+    const AI_TRIGGERS = ['fridge','pantry','have','got','what can i','ingredients','leftovers','using'];
+
+    async function handleSearch() {
+      const q = document.getElementById('hero-search-input').value.trim();
+      if (!q) return;
+
+      const isAiPrompt = AI_TRIGGERS.some(t => q.toLowerCase().includes(t));
+      if (isAiPrompt) {
+        const btn = document.getElementById('hero-search-btn');
+        btn.disabled = true;
+        try {
+          const res  = await fetch(`${API_BASE_URL}/ai/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: q }),
+          });
+          const data = await res.json();
+          if (res.ok && data.recipe) {
+            sessionStorage.setItem('ai_recipe', JSON.stringify(data.recipe));
+            const result = document.getElementById('hero-ai-result');
+            result.innerHTML = `
+              <div class="zj-ai-result-inner">
+                <div class="zj-ai-name">${data.recipe.name}</div>
+                <div class="zj-ai-desc">${data.recipe.description}</div>
+                <div class="zj-ai-actions">
+                  <a href="add-recipe.html" class="zj-ai-add">+ Add Recipe</a>
+                  <button onclick="this.closest('#hero-ai-result').style.display='none'" class="zj-ai-dismiss">Dismiss</button>
+                </div>
+              </div>`;
+            result.style.display = 'block';
+          } else {
+            window.location.href = `foods.html?search=${encodeURIComponent(q)}`;
+          }
+        } catch(e) {
+          window.location.href = `foods.html?search=${encodeURIComponent(q)}`;
+        }
+        btn.disabled = false;
+      } else {
+        window.location.href = `foods.html?search=${encodeURIComponent(q)}`;
+      }
+    }
+
+    document.getElementById('hero-search-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    // Load featured collections
+    fetchCollections().then(cols => {
+      if (!cols || !cols.length) return;
+      document.getElementById('collections-section').style.display = '';
+      document.getElementById('collections-grid').innerHTML = cols.slice(0, 4).map(c => `
+        <a href="collections.html?slug=${c.slug}" class="zj-collection-card">
+          <div class="zj-collection-img" style="background:url(${c.cover_image_url||'images/food-doro.jpg'}) center/cover no-repeat;background-color:#f0eeea;"></div>
+          <div class="zj-collection-body">
+            <h3>${c.title}</h3>
+            <p>${c.description}</p>
+            <span class="zj-collection-count">${c.dish_ids.length} dish${c.dish_ids.length!==1?'es':''} →</span>
+          </div>
+        </a>`).join('');
+    }).catch(() => {});
+  </script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>

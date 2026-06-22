@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — My Pantry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #f8f6f2; }
+    .page-wrap { max-width: 860px; margin: 0 auto; padding: 110px 24px 80px; }
+    .page-title { font-size: 42px; color: #263020; margin-bottom: 6px; }
+    .page-sub { font-family: Georgia,serif; color: #888; font-size: 15px; margin-bottom: 36px; }
+
+    /* Add item card */
+    .add-card { background:#fff; border-radius:18px; box-shadow:0 4px 20px rgba(0,0,0,.06); padding:28px 32px; margin-bottom:36px; }
+    .add-card h3 { font-size:20px; color:#263020; margin-bottom:18px; }
+    .add-row { display:flex; gap:12px; flex-wrap:wrap; }
+    .add-row input {
+      flex:1; min-width:160px; padding:11px 16px;
+      border:2px solid #e8e8e8; border-radius:10px;
+      font-family:Georgia,serif; font-size:15px; color:#263020;
+      outline:none; transition:border-color .2s;
+    }
+    .add-row input:focus { border-color:#FF9124; }
+    .add-row input::placeholder { color:#bbb; }
+    .btn-add {
+      padding:11px 28px; background:#FF9124; border:none; border-radius:10px;
+      color:#fff; font-family:'Times New Roman',serif; font-size:16px;
+      cursor:pointer; transition:background .2s; white-space:nowrap;
+    }
+    .btn-add:hover { background:#263020; }
+
+    /* AI suggest */
+    .ai-suggest-bar {
+      background:#263020; border-radius:14px; padding:20px 28px;
+      display:flex; align-items:center; gap:16px; margin-bottom:36px; flex-wrap:wrap;
+    }
+    .ai-suggest-bar p { color:#fff; font-family:Georgia,serif; font-size:15px; flex:1; min-width:200px; }
+    .ai-suggest-bar p span { color:#FF9124; font-weight:bold; }
+    .btn-ai {
+      padding:11px 24px; background:#FF9124; border:none; border-radius:10px;
+      color:#fff; font-family:'Times New Roman',serif; font-size:15px;
+      cursor:pointer; transition:background .2s; white-space:nowrap;
+    }
+    .btn-ai:hover { background:#fff; color:#FF9124; }
+
+    /* Pantry grid */
+    .pantry-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px;
+    }
+    .pantry-item {
+      background:#fff; border-radius:14px; padding:18px 20px;
+      box-shadow:0 2px 12px rgba(0,0,0,.06);
+      display:flex; flex-direction:column; gap:6px;
+      position:relative; transition:box-shadow .2s;
+    }
+    .pantry-item:hover { box-shadow:0 4px 20px rgba(0,0,0,.12); }
+    .pantry-item-name { font-size:17px; color:#263020; font-family:'Times New Roman',serif; }
+    .pantry-item-meta { font-size:13px; color:#999; font-family:Georgia,serif; }
+    .expiry-soon { color:#e67e22 !important; }
+    .expiry-past  { color:#c0392b !important; }
+    .del-item {
+      position:absolute; top:12px; right:12px;
+      background:none; border:none; color:#ddd; font-size:18px;
+      cursor:pointer; transition:color .2s;
+    }
+    .del-item:hover { color:#FF9124; }
+
+    /* AI recipe result */
+    .ai-result {
+      background:#fff; border-radius:18px; box-shadow:0 4px 20px rgba(0,0,0,.07);
+      padding:28px 32px; margin-bottom:36px; display:none;
+    }
+    .ai-result h3 { font-size:22px; color:#263020; margin-bottom:8px; }
+    .ai-result p { font-family:Georgia,serif; color:#666; font-size:15px; line-height:1.6; margin-bottom:14px; }
+    .ai-result-meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+    .ai-result-meta span { background:#f5f5f5; padding:5px 13px; border-radius:20px; font-size:13px; color:#666; }
+    .btn-use-recipe {
+      padding:11px 24px; background:#FF9124; border:none; border-radius:10px;
+      color:#fff; font-family:'Times New Roman',serif; font-size:15px;
+      cursor:pointer; transition:background .2s;
+    }
+    .btn-use-recipe:hover { background:#263020; }
+
+    /* Empty / loader */
+    .empty { text-align:center; padding:60px; color:#aaa; font-family:Georgia,serif; font-size:18px; }
+    .loader-msg { text-align:center; padding:20px; color:#aaa; font-family:Georgia,serif; }
+
+    /* login gate */
+    .login-gate { text-align:center; padding:100px 20px; }
+    .login-gate h2 { font-size:32px; color:#263020; margin-bottom:12px; }
+    .login-gate p { font-family:Georgia,serif; color:#888; margin-bottom:24px; }
+    .login-gate a { display:inline-block; padding:13px 32px; background:#FF9124; color:#fff; border-radius:10px; text-decoration:none; font-family:'Times New Roman',serif; font-size:17px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html">
+      <img src="images/logo-white.png" alt="Megeb"
+           data-logo-white="images/logo-white.png"
+           data-logo-dark="images/logo-dark.png">
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="foods.html">Foods</a>
+      <a href="pantry.html" style="color:#FF9124">Pantry</a>
+      <a href="add-recipe.html" id="nav-add" style="display:none">+ Add Recipe</a>
+      <a href="signup.html" id="nav-login">Sign Up</a>
+      <a href="#" id="nav-logout" style="display:none" onclick="logout()">
+        <span id="nav-username"></span> &middot; Logout
+      </a>
+    </nav>
+  </header>
+
+  <div class="page-wrap" id="page-wrap">
+    <!-- login gate shown if not logged in -->
+    <div class="login-gate" id="login-gate" style="display:none">
+      <h2>Your Pantry Awaits</h2>
+      <p>Log in to track your ingredients and get AI-powered recipe suggestions.</p>
+      <a href="login.html?next=pantry.html">Log In to Continue</a>
+    </div>
+
+    <div id="pantry-app" style="display:none">
+      <h1 class="page-title">🥦 My Pantry</h1>
+      <p class="page-sub">Track what's in your kitchen. Megeb AI will suggest recipes from what you have.</p>
+
+      <!-- Add item -->
+      <div class="add-card">
+        <h3>Add an ingredient</h3>
+        <div class="add-row">
+          <input type="text" id="item-name" placeholder="Ingredient (e.g. Tomatoes)" onkeydown="if(event.key==='Enter')addItem()">
+          <input type="text" id="item-qty"  placeholder="Quantity (e.g. 3)" style="max-width:120px">
+          <input type="text" id="item-unit" placeholder="Unit (e.g. kg)" style="max-width:100px">
+          <input type="date" id="item-expiry" title="Expiry date (optional)" style="max-width:160px">
+          <button class="btn-add" onclick="addItem()">+ Add</button>
+        </div>
+      </div>
+
+      <!-- AI suggest bar -->
+      <div class="ai-suggest-bar">
+        <p>🤖 <span>Megeb AI</span> — Click to generate a recipe from what's in your pantry right now.</p>
+        <button class="btn-ai" id="suggest-btn" onclick="suggestRecipe()">✨ What can I cook?</button>
+      </div>
+
+      <!-- AI result card -->
+      <div class="ai-result" id="ai-result">
+        <h3 id="ar-name"></h3>
+        <p id="ar-desc"></p>
+        <div class="ai-result-meta" id="ar-meta"></div>
+        <button class="btn-use-recipe" onclick="useRecipe()">✚ Use this recipe</button>
+      </div>
+
+      <!-- Pantry grid -->
+      <div id="pantry-grid" class="pantry-grid"></div>
+      <div id="pantry-loader" class="loader-msg">Loading your pantry...</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-background">
+      <div class="footer-overlay">
+        <div class="footer-logo"><img src="images/logo-white.png" alt="Megeb"></div>
+        <div class="footer-grid">
+          <div><h3>Megeb</h3>Ancient dishes, Modern Kitchen.</div>
+          <div>
+            <h3>Explore</h3>
+            <a href="index.html">Home</a><br>
+            <a href="foods.html">Foods</a><br>
+            <a href="pantry.html">My Pantry</a>
+          </div>
+          <div><h3>The Studio</h3>Bole Atlas, Addis Ababa<br>hello@megeb.com</div>
+        </div>
+        <div class="footer-bottom"><small>&copy; 2024 Megeb &mdash; All Rights Reserved.</small></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ai-widget.js"></script>
+  <script>
+    updateNav();
+
+    if (!isLoggedIn()) {
+      document.getElementById('login-gate').style.display = 'block';
+    } else {
+      document.getElementById('pantry-app').style.display = 'block';
+      loadPantry();
+    }
+
+    let pendingAiRecipe = null;
+
+    async function loadPantry() {
+      try {
+        const items = await pantryList();
+        renderPantry(items);
+      } catch (e) {
+        document.getElementById('pantry-loader').textContent = 'Could not load pantry — is the server running?';
+      }
+    }
+
+    function renderPantry(items) {
+      document.getElementById('pantry-loader').style.display = 'none';
+      const grid = document.getElementById('pantry-grid');
+      if (!items.length) {
+        grid.innerHTML = '<div class="empty" style="grid-column:1/-1">Your pantry is empty. Add your first ingredient above! 🥕</div>';
+        return;
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      grid.innerHTML = items.map(item => {
+        let expiryHtml = '';
+        if (item.expiry) {
+          const cls = item.expiry < today ? 'expiry-past' : item.expiry <= addDays(today, 3) ? 'expiry-soon' : '';
+          expiryHtml = `<span class="pantry-item-meta ${cls}">Expires: ${item.expiry}</span>`;
+        }
+        return `
+          <div class="pantry-item" id="pi-${item.id}">
+            <button class="del-item" onclick="removeItem('${item.id}')" title="Remove">×</button>
+            <span class="pantry-item-name">${item.name}</span>
+            <span class="pantry-item-meta">${[item.quantity, item.unit].filter(Boolean).join(' ') || 'In stock'}</span>
+            ${expiryHtml}
+          </div>`;
+      }).join('');
+    }
+
+    function addDays(dateStr, days) {
+      const d = new Date(dateStr);
+      d.setDate(d.getDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+
+    async function addItem() {
+      const name   = document.getElementById('item-name').value.trim();
+      if (!name) return;
+      const qty    = document.getElementById('item-qty').value.trim();
+      const unit   = document.getElementById('item-unit').value.trim();
+      const expiry = document.getElementById('item-expiry').value;
+      try {
+        await pantryAdd({ name, quantity: qty, unit, expiry });
+        document.getElementById('item-name').value   = '';
+        document.getElementById('item-qty').value    = '';
+        document.getElementById('item-unit').value   = '';
+        document.getElementById('item-expiry').value = '';
+        loadPantry();
+      } catch (e) {
+        alert('Could not add item: ' + e.message);
+      }
+    }
+
+    async function removeItem(id) {
+      try {
+        await pantryRemove(id);
+        const el = document.getElementById(`pi-${id}`);
+        if (el) el.remove();
+      } catch (e) {
+        alert('Could not remove item: ' + e.message);
+      }
+    }
+
+    async function suggestRecipe() {
+      const btn = document.getElementById('suggest-btn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Thinking...';
+      document.getElementById('ai-result').style.display = 'none';
+
+      try {
+        const items = await pantryList();
+        const ingredients = items.map(i => i.name);
+        if (!ingredients.length) {
+          alert('Add some ingredients to your pantry first!');
+          btn.disabled = false;
+          btn.textContent = '✨ What can I cook?';
+          return;
+        }
+        const res  = await fetch(`${API_BASE_URL}/ai/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ingredients }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const msg = res.status === 503
+            ? 'AI not configured — add GROQ_API_KEY to backend/.env'
+            : res.status === 429
+            ? 'Rate limit reached. Try again later.'
+            : 'AI is unavailable right now. Try again later.';
+          alert(msg);
+        } else if (data.recipe) {
+          pendingAiRecipe = data.recipe;
+          document.getElementById('ar-name').textContent = data.recipe.name;
+          document.getElementById('ar-desc').textContent = data.recipe.description;
+          const meta = document.getElementById('ar-meta');
+          meta.innerHTML = [
+            data.recipe.prep_time && `⏱ ${data.recipe.prep_time}`,
+            data.recipe.cook_time && `🍳 ${data.recipe.cook_time}`,
+            data.recipe.servings  && `🍽 ${data.recipe.servings}`,
+            data.recipe.nationality && `🌍 ${data.recipe.nationality}`,
+          ].filter(Boolean).map(t => `<span>${t}</span>`).join('');
+          document.getElementById('ai-result').style.display = 'block';
+        } else {
+          alert('AI could not generate a recipe. Try adding more ingredients.');
+        }
+      } catch (e) {
+        alert('Connection error — is the server running?');
+      }
+      btn.disabled = false;
+      btn.textContent = '✨ What can I cook?';
+    }
+
+    function useRecipe() {
+      if (!pendingAiRecipe) return;
+      sessionStorage.setItem('ai_recipe', JSON.stringify(pendingAiRecipe));
+      window.location.href = 'add-recipe.html';
+    }
+  </script>
+</body>
+</html>

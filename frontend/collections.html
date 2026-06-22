@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — Collection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .collection-hero { position:relative; height:320px; overflow:hidden; }
+    .collection-hero img { width:100%; height:100%; object-fit:cover; }
+    .collection-hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(0,0,0,.1),rgba(0,0,0,.55)); display:flex; align-items:flex-end; padding:40px 8%; }
+    .collection-hero-overlay h1 { font-family:'Times New Roman',serif; font-size:3rem; color:#fff; }
+    .collection-desc { padding:28px 8% 10px; font-family:Georgia,serif; font-size:16px; color:#666; line-height:1.7; max-width:700px; }
+    .section-title { font-size:2rem; color:#263020; padding:20px 8% 24px; font-family:'Times New Roman',serif; }
+    .section-title span { color:#FF9124; }
+    .foods-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:30px; padding:0 8% 80px; }
+    .food-item { border-radius:16px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.08); cursor:pointer; transition:transform .3s; background:#fff; }
+    .food-item:hover { transform:translateY(-5px); }
+    .food-item img { width:100%; height:200px; object-fit:cover; }
+    .food-item-body { padding:16px; }
+    .food-item-body h3 { font-size:20px; color:#263020; font-family:'Times New Roman',serif; margin-bottom:4px; }
+    .food-item-body .amharic { font-size:14px; color:#aaa; margin-bottom:6px; }
+    .food-item-body p { font-size:14px; color:#777; line-height:1.5; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+    .food-item-meta { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+    .food-item-meta a { font-size:13px; color:#FF9124; text-decoration:none; font-weight:600; }
+    .cat-chip { font-size:11px; background:#f0f0f0; color:#555; border-radius:20px; padding:2px 10px; }
+    .empty { text-align:center; padding:80px 20px; color:#999; font-family:Georgia,serif; font-size:20px; grid-column:1/-1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html">
+      <img src="images/logo-white.png" alt="Megeb"
+           data-logo-white="images/logo-white.png"
+           data-logo-dark="images/logo-dark.png">
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="foods.html">Foods</a>
+      <a href="pantry.html">Pantry</a>
+      <a href="add-recipe.html" id="nav-add" style="display:none">+ Add Recipe</a>
+      <a href="admin.html" id="nav-admin" style="display:none">Admin</a>
+      <a href="signup.html" id="nav-login">Sign Up</a>
+      <a href="#" id="nav-logout" style="display:none" onclick="logout()">
+        <span id="nav-username"></span> · Logout
+      </a>
+    </nav>
+  </header>
+
+  <div class="collection-hero" id="collection-hero">
+    <img id="cover-img" src="images/food-doro.jpg" alt="">
+    <div class="collection-hero-overlay">
+      <h1 id="collection-title">Loading…</h1>
+    </div>
+  </div>
+
+  <p class="collection-desc" id="collection-desc"></p>
+
+  <h2 class="section-title">Dishes in this <span>collection</span></h2>
+  <div class="foods-grid" id="dishes-grid">
+    <div class="empty">Loading…</div>
+  </div>
+
+  <div class="textabovefooter"><h6>The Kitchen where The Magic Happens</h6></div>
+
+  <footer>
+    <div class="footer-background">
+      <div class="footer-overlay">
+        <div class="footer-logo"><img src="images/logo-white.png" alt="Megeb"></div>
+        <div class="footer-grid">
+          <div><h3>Megeb</h3>Ancient dishes, Modern Kitchen.</div>
+          <div>
+            <h3>Explore</h3>
+            <a href="index.html">Home</a><br>
+            <a href="foods.html">Foods</a><br>
+            <a href="add-recipe.html">Add Recipe</a>
+          </div>
+          <div><h3>The Studio</h3>Bole Atlas, Addis Ababa<br>hello@megeb.com</div>
+        </div>
+        <div class="footer-bottom"><small>&copy; 2024 Megeb — All Rights Reserved.</small></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    updateNav();
+
+    const slug = new URLSearchParams(window.location.search).get('slug');
+    if (!slug) { window.location.href = 'index.html'; }
+
+    fetchCollection(slug).then(async col => {
+      document.title = `Megeb — ${col.title}`;
+      document.getElementById('collection-title').textContent = col.title;
+      document.getElementById('collection-desc').textContent = col.description || '';
+      if (col.cover_image_url) {
+        document.getElementById('cover-img').src = col.cover_image_url;
+      }
+
+      if (!col.dish_ids || !col.dish_ids.length) {
+        document.getElementById('dishes-grid').innerHTML = '<div class="empty">No dishes in this collection yet.</div>';
+        return;
+      }
+
+      // Fetch all dishes and filter by the collection's dish_ids client-side
+      const data = await apiFetch(`/api/dishes?limit=100`);
+      const allDishes = data.dishes || [];
+      const collectionDishes = allDishes.filter(d => col.dish_ids.includes(d.id));
+
+      if (!collectionDishes.length) {
+        document.getElementById('dishes-grid').innerHTML = '<div class="empty">Dishes in this collection are coming soon.</div>';
+        return;
+      }
+
+      document.getElementById('dishes-grid').innerHTML = collectionDishes.map(d => `
+        <div class="food-item" onclick="window.location.href='recipe.html?slug=${d.slug}'">
+          <img src="${d.reference_image_url || 'images/food-doro.jpg'}" alt="${d.name}" onerror="this.src='images/food-doro.jpg'">
+          <div class="food-item-body">
+            <h3>${d.name}</h3>
+            ${d.name_amharic ? `<div class="amharic">${d.name_amharic}</div>` : ''}
+            <p>${d.description}</p>
+            <div class="food-item-meta">
+              <span class="cat-chip">${d.category}</span>
+              <a href="recipe.html?slug=${d.slug}">View Dish →</a>
+            </div>
+          </div>
+        </div>`).join('');
+
+    }).catch(() => {
+      document.getElementById('collection-title').textContent = 'Collection not found';
+      document.getElementById('dishes-grid').innerHTML = '<div class="empty">Could not load this collection.</div>';
+    });
+  </script>
+</body>
+</html>

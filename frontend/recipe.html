@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — Dish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Variation pills ─────────────────────────────────────────────────── */
+    .variation-bar {
+      padding: 28px 8% 0;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .variation-bar-label {
+      font-family: Georgia,serif; font-size: 13px; color: #aaa;
+      letter-spacing: 1px; margin-right: 4px;
+    }
+    .var-pills { display: flex; gap: 10px; flex-wrap: wrap; position: relative; }
+    .var-pill {
+      padding: 9px 20px; border-radius: 30px;
+      border: 2px solid #e8e8e8; background: #fff;
+      font-family: Georgia,serif; font-size: 14px; color: #555;
+      cursor: pointer; transition: color .2s, border-color .2s;
+      position: relative; z-index: 1;
+    }
+    .var-pill.active { border-color: #FF9124; color: #FF9124; font-weight: 600; }
+    /* Sliding underline indicator */
+    .pill-indicator {
+      position: absolute; bottom: -3px; height: 3px;
+      background: #FF9124; border-radius: 2px;
+      transition: left .25s ease, width .25s ease;
+    }
+
+    /* Add variation button */
+    .add-var-btn {
+      margin-left: auto;
+      padding: 9px 20px; border-radius: 30px;
+      border: 2px dashed #FF9124; background: none;
+      font-family: Georgia,serif; font-size: 14px; color: #FF9124;
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .add-var-btn:hover { background: #FF9124; color: #fff; }
+
+    /* ── Variation content area ───────────────────────────────────────────── */
+    .variation-content {
+      position: relative; overflow: hidden;
+    }
+    .variation-panel {
+      opacity: 0; transform: translateY(12px);
+      pointer-events: none; position: absolute; top: 0; left: 0; right: 0;
+      transition: opacity .28s ease-out, transform .28s ease-out;
+    }
+    .variation-panel.active {
+      opacity: 1; transform: translateY(0);
+      pointer-events: auto; position: relative;
+    }
+
+    /* ── Dish info strip ─────────────────────────────────────────────────── */
+    .dish-info {
+      padding: 32px 8% 0;
+      display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;
+    }
+    .dish-info-text { flex: 1; min-width: 260px; }
+    .dish-info-text h1 { font-family:'Times New Roman',serif; font-size: 38px; color: #263020; margin-bottom: 4px; }
+    .dish-amharic { font-size: 18px; color: #aaa; margin-bottom: 12px; }
+    .dish-desc { font-family: Georgia,serif; font-size: 16px; color: #666; line-height: 1.7; max-width: 680px; }
+    .dish-meta { display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+    .dish-meta span { font-family:Georgia,serif; font-size:13px; color:#888; }
+
+    /* ── Empty variation state ───────────────────────────────────────────── */
+    .no-variations {
+      padding: 60px 8%;
+      text-align: center; font-family: Georgia,serif;
+    }
+    .no-variations h3 { font-size: 26px; color: #263020; margin-bottom: 12px; }
+    .no-variations p { color: #888; font-size: 16px; margin-bottom: 28px; }
+    .no-variations .cta-btn {
+      display: inline-block; padding: 13px 32px;
+      background: #FF9124; color: #fff; border-radius: 12px;
+      text-decoration: none; font-family:'Times New Roman',serif; font-size: 17px;
+      transition: background .2s;
+    }
+    .no-variations .cta-btn:hover { background: #263020; }
+    .no-variations-icon {
+      font-size: 64px; margin-bottom: 16px;
+      animation: bob .8s ease-in-out infinite alternate;
+    }
+    @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+
+    /* Pending */
+    .pending-strip {
+      margin: 16px 8%; padding: 14px 20px;
+      background: #fff8e6; border-left: 4px solid #FF9124;
+      border-radius: 8px; font-family:Georgia,serif; font-size:14px; color:#856404;
+    }
+
+    /* Cook mode */
+    .cook-mode-overlay {
+      display: none; position: fixed; inset: 0;
+      background: #1a1a1a; z-index: 9999;
+      flex-direction: column; align-items: center; justify-content: center; padding: 30px 20px;
+    }
+    .cook-mode-overlay.open { display: flex; }
+    .cook-header { position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:18px 28px; background:rgba(0,0,0,.4); }
+    .cook-header-title { color:#FF9124; font-family:'Times New Roman',serif; font-size:20px; }
+    .cook-close { background:none; border:2px solid rgba(255,255,255,.2); color:#fff; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Georgia,serif; font-size:14px; transition:border-color .2s; }
+    .cook-close:hover { border-color:#FF9124; color:#FF9124; }
+    .cook-progress { display:flex; gap:8px; margin-bottom:32px; flex-wrap:wrap; justify-content:center; }
+    .cook-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,.2); transition:background .3s; }
+    .cook-dot.done { background:#FF9124; }
+    .cook-dot.current { background:#fff; }
+    .cook-step-box { background:rgba(255,255,255,.06); border-radius:20px; padding:40px 48px; max-width:680px; width:100%; text-align:center; }
+    .cook-step-num { font-family:Georgia,serif; font-size:13px; color:rgba(255,255,255,.4); letter-spacing:2px; margin-bottom:12px; }
+    .cook-step-title { font-family:'Times New Roman',serif; font-size:24px; color:#FF9124; margin-bottom:14px; }
+    .cook-step-text { font-family:Georgia,serif; font-size:18px; color:#fff; line-height:1.8; }
+    .cook-timer { margin-top:28px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+    .timer-display { font-family:'Courier New',monospace; font-size:42px; color:#FF9124; letter-spacing:4px; }
+    .timer-controls { display:flex; gap:10px; }
+    .timer-btn { padding:10px 22px; border:2px solid rgba(255,255,255,.2); border-radius:10px; background:none; color:#fff; font-family:Georgia,serif; font-size:14px; cursor:pointer; transition:all .2s; }
+    .timer-btn:hover { border-color:#FF9124; color:#FF9124; }
+    .timer-btn.active { background:#FF9124; border-color:#FF9124; color:#fff; }
+    .timer-presets { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+    .timer-preset { padding:6px 14px; border:1px solid rgba(255,255,255,.15); border-radius:20px; background:none; color:rgba(255,255,255,.6); font-family:Georgia,serif; font-size:13px; cursor:pointer; transition:all .2s; }
+    .timer-preset:hover { border-color:#FF9124; color:#FF9124; }
+    .cook-nav { display:flex; gap:16px; margin-top:32px; }
+    .cook-btn { padding:13px 32px; border-radius:12px; border:none; cursor:pointer; font-family:'Times New Roman',serif; font-size:17px; transition:all .2s; }
+    .cook-btn.prev { background:rgba(255,255,255,.08); color:#fff; }
+    .cook-btn.prev:hover { background:rgba(255,255,255,.15); }
+    .cook-btn.next { background:#FF9124; color:#fff; }
+    .cook-btn.next:hover { background:#fff; color:#FF9124; }
+    .cook-btn:disabled { opacity:.3; cursor:default; }
+    .cook-mode-btn { display:inline-flex; align-items:center; gap:10px; padding:13px 28px; background:#263020; color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:'Times New Roman',serif; font-size:17px; transition:background .2s; margin-top:16px; }
+    .cook-mode-btn:hover { background:#FF9124; }
+
+    /* ── Story callout ────────────────────────────────────────────────────── */
+    .story-callout {
+      margin: 20px 8% 0;
+      background: #fdf8f2; border-left: 4px solid #FF9124;
+      border-radius: 0 12px 12px 0;
+      padding: 18px 24px;
+      font-family: Georgia,serif; font-size: 15px; color: #555; line-height: 1.75;
+      font-style: italic;
+    }
+    .story-callout .story-label {
+      font-size: 11px; letter-spacing: 1px; color: #FF9124;
+      font-style: normal; display: block; margin-bottom: 6px;
+    }
+
+    /* ── Pronunciation ────────────────────────────────────────────────────── */
+    .phonetic-wrap {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 6px;
+    }
+    .speaker-btn {
+      background: none; border: 2px solid #e8e8e8; border-radius: 50%;
+      width: 32px; height: 32px; cursor: pointer; font-size: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: border-color .2s; flex-shrink: 0;
+    }
+    .speaker-btn:hover { border-color: #FF9124; }
+    .phonetic-text { font-family: Georgia,serif; font-size: 13px; color: #aaa; font-style: italic; }
+
+    /* ── Contributor badge ────────────────────────────────────────────────── */
+    .contributor-badge {
+      font-size: 11px; border-radius: 20px; padding: 2px 9px;
+      font-family: Georgia,serif; font-weight: 600; display: inline-block;
+    }
+    .badge-contributor   { background: #e8f5e9; color: #2e7d32; }
+    .badge-regular       { background: #e3f2fd; color: #1565c0; }
+    .badge-top           { background: #fff8e1; color: #f57f17; }
+
+    /* ── Substitution popover ─────────────────────────────────────────────── */
+    .sub-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 13px; color: #ccc; padding: 0 2px; vertical-align: middle;
+      transition: color .2s;
+    }
+    .sub-btn:hover { color: #FF9124; }
+    .sub-popover {
+      display: none; position: fixed; z-index: 1000;
+      background: #fff; border: 1px solid #e8e8e8; border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.15); padding: 16px 20px;
+      max-width: 320px; font-family: Georgia,serif; font-size: 14px; color: #555;
+    }
+    .sub-popover.open { display: block; }
+    .sub-popover-title { font-size: 13px; color: #FF9124; font-weight: 600; margin-bottom: 8px; }
+    .sub-popover-close { float: right; background: none; border: none; cursor: pointer; color: #ccc; font-size: 18px; line-height: 1; }
+    .sub-popover-body { line-height: 1.6; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html">
+      <img src="images/logo-white.png" alt="Megeb"
+           data-logo-white="images/logo-white.png"
+           data-logo-dark="images/logo-dark.png">
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="foods.html">Foods</a>
+      <a href="pantry.html">Pantry</a>
+      <a href="table.html">Menu Builder</a>
+      <a href="add-recipe.html" id="nav-add" style="display:none">+ Add Recipe</a>
+      <a href="admin.html" id="nav-admin" style="display:none">Admin</a>
+      <a href="signup.html" id="nav-login">Sign Up</a>
+      <a href="#" id="nav-logout" style="display:none" onclick="logout()">
+        <span id="nav-username"></span> · Logout
+      </a>
+    </nav>
+  </header>
+
+  <div class="hero static" id="recipe-hero">
+    <img src="" alt="" class="hero-img" id="hero-img">
+    <div class="hero-title" id="hero-title"><h1></h1></div>
+  </div>
+
+  <div class="banner-wrapper">
+    <div class="bannerbox">
+      <div class="banner-track">
+        <div class="bannertext"><h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;<h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;<h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;<h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div class="bannertext"><h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;<h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;<h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;<h8>Create The Taste</h8>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dish info -->
+  <div class="dish-info" id="dish-info" style="display:none">
+    <div class="dish-info-text">
+      <h1 id="dish-name"></h1>
+      <div class="dish-amharic" id="dish-amharic"></div>
+      <div id="pronunciation-wrap" style="display:none" class="phonetic-wrap">
+        <button class="speaker-btn" id="speaker-btn" title="Hear pronunciation">🔊</button>
+        <span class="phonetic-text" id="phonetic-text"></span>
+      </div>
+      <p class="dish-desc" id="dish-desc"></p>
+      <div class="dish-meta" id="dish-meta"></div>
+    </div>
+  </div>
+
+  <!-- Substitution popover (shared, repositioned by JS) -->
+  <div class="sub-popover" id="sub-popover">
+    <button class="sub-popover-close" onclick="closeSubPopover()">×</button>
+    <div class="sub-popover-title">🔄 Substitutes for <span id="sub-ingredient-name"></span></div>
+    <div class="sub-popover-body" id="sub-popover-body">Loading…</div>
+  </div>
+
+  <!-- Variation pills bar -->
+  <div class="variation-bar" id="variation-bar" style="display:none">
+    <span class="variation-bar-label">VERSIONS</span>
+    <div class="var-pills" id="var-pills"></div>
+    <button class="add-var-btn" id="add-var-btn" onclick="goAddVariation()">+ Add your version</button>
+  </div>
+
+  <!-- Variation content (crossfade) -->
+  <div class="variation-content" id="variation-content" style="min-height:400px"></div>
+
+  <!-- No variations state -->
+  <div class="no-variations" id="no-variations" style="display:none">
+    <div class="no-variations-icon">🍽️</div>
+    <h3 id="no-var-title">Be the first to share your version!</h3>
+    <p id="no-var-desc">No one has added a variation for this dish yet. Share how you make it!</p>
+    <a href="#" id="no-var-cta" class="cta-btn">Share Your Version</a>
+  </div>
+
+  <div class="textabovefooter"><h6>The Kitchen where The Magic Happens</h6></div>
+
+  <footer>
+    <div class="footer-background">
+      <div class="footer-overlay">
+        <div class="footer-logo"><img src="images/logo-white.png" alt="Megeb"></div>
+        <div class="footer-grid">
+          <div><h3>Megeb</h3>Ancient dishes, Modern Kitchen.</div>
+          <div>
+            <h3>Explore</h3>
+            <a href="index.html">Home</a><br>
+            <a href="foods.html">Foods</a><br>
+            <a href="pantry.html">My Pantry</a><br>
+          </div>
+          <div><h3>The Studio</h3>Bole Atlas, Addis Ababa<br>hello@megeb.com</div>
+        </div>
+        <div class="footer-bottom"><small>&copy; 2024 Megeb — All Rights Reserved.</small></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cook Mode -->
+  <div class="cook-mode-overlay" id="cook-overlay">
+    <div class="cook-header">
+      <span class="cook-header-title" id="cook-recipe-title">Cook Mode</span>
+      <button class="cook-close" onclick="closeCookMode()">✕ Exit Cook Mode</button>
+    </div>
+    <div class="cook-progress" id="cook-progress"></div>
+    <div class="cook-step-box">
+      <div class="cook-step-num" id="cook-step-num"></div>
+      <div class="cook-step-title" id="cook-step-title"></div>
+      <div class="cook-step-text" id="cook-step-text"></div>
+      <div class="cook-timer">
+        <div class="timer-display" id="timer-display">00:00</div>
+        <div class="timer-presets">
+          <button class="timer-preset" onclick="setTimer(1)">1 min</button>
+          <button class="timer-preset" onclick="setTimer(3)">3 min</button>
+          <button class="timer-preset" onclick="setTimer(5)">5 min</button>
+          <button class="timer-preset" onclick="setTimer(10)">10 min</button>
+          <button class="timer-preset" onclick="setTimer(15)">15 min</button>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn" id="timer-start-btn" onclick="toggleTimer()">▶ Start</button>
+          <button class="timer-btn" onclick="resetTimer()">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="cook-nav">
+      <button class="cook-btn prev" id="cook-prev" onclick="cookStep(-1)">← Previous</button>
+      <button class="cook-btn next" id="cook-next" onclick="cookStep(1)">Next →</button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ai-widget.js"></script>
+  <script>
+    updateNav();
+
+    const slug = new URLSearchParams(window.location.search).get('slug');
+    // Legacy: support ?id= for old recipe links
+    const legacyId = new URLSearchParams(window.location.search).get('id');
+
+    let currentDish = null;
+    let currentVariations = [];
+    let activeVarIdx = 0;
+    let cookSteps = [], cookIndex = 0;
+
+    if (!slug && !legacyId) {
+      show404();
+    } else if (legacyId && !slug) {
+      // Redirect legacy id to foods page gracefully
+      window.location.href = 'foods.html';
+    } else {
+      fetchDish(slug).then(init).catch(show404);
+    }
+
+    function show404() {
+      document.body.innerHTML = `<div style="text-align:center;padding:200px 20px;font-family:Georgia,serif;">
+        <h2 style="color:#263020;font-size:40px;">Dish not found.</h2>
+        <a href="foods.html" style="color:#FF9124;font-size:18px;">← Back to Foods</a></div>`;
+    }
+
+    function init(data) {
+      currentDish = data;
+      currentVariations = data.variations || [];
+
+      document.title = `Megeb — ${data.name}`;
+
+      const heroImg = document.getElementById('hero-img');
+      heroImg.src = data.reference_image_url || 'images/food-doro.jpg';
+      heroImg.onerror = () => heroImg.src = 'images/food-doro.jpg';
+      heroImg.alt = data.name;
+      document.getElementById('hero-title').querySelector('h1').textContent = data.name;
+
+      // Dish info strip
+      document.getElementById('dish-name').textContent = data.name;
+      if (data.name_amharic) document.getElementById('dish-amharic').textContent = data.name_amharic;
+      document.getElementById('dish-desc').textContent = data.description;
+
+      // Pronunciation
+      if (data.pronunciation_audio_url || data.phonetic_name) {
+        const wrap = document.getElementById('pronunciation-wrap');
+        const btn = document.getElementById('speaker-btn');
+        const phonetic = document.getElementById('phonetic-text');
+        wrap.style.display = 'inline-flex';
+        if (data.phonetic_name) phonetic.textContent = `"${data.phonetic_name}"`;
+        if (data.pronunciation_audio_url) {
+          const audio = new Audio(data.pronunciation_audio_url);
+          btn.onclick = () => { audio.currentTime = 0; audio.play(); };
+        } else {
+          btn.style.display = 'none';
+        }
+      }
+
+      const meta = document.getElementById('dish-meta');
+      if (data.category) meta.innerHTML += `<span>🏷 ${data.category}</span>`;
+      if (data.region) meta.innerHTML += `<span>📍 ${data.region}</span>`;
+      document.getElementById('dish-info').style.display = 'flex';
+
+      // CTA for add variation
+      const addUrl = `add-recipe.html?mode=variation&slug=${slug}&name=${encodeURIComponent(data.name)}`;
+      document.getElementById('add-var-btn').onclick = () => {
+        if (!isLoggedIn()) { window.location.href = `login.html?next=${encodeURIComponent(window.location.href)}`; return; }
+        window.location.href = addUrl;
+      };
+      document.getElementById('no-var-cta').href = addUrl;
+      document.getElementById('no-var-title').textContent = `Be the first to add a version of ${data.name}!`;
+      document.getElementById('no-var-desc').textContent = `Share how you make ${data.name} — your family recipe, regional twist, or favourite take.`;
+
+      if (currentVariations.length === 0) {
+        document.getElementById('no-variations').style.display = 'block';
+        document.getElementById('variation-bar').style.display = 'none';
+      } else {
+        document.getElementById('no-variations').style.display = 'none';
+        document.getElementById('variation-bar').style.display = 'flex';
+        buildPills();
+        showVariation(0);
+      }
+    }
+
+    function buildPills() {
+      const container = document.getElementById('var-pills');
+      container.innerHTML = currentVariations.map((v, i) =>
+        `<button class="var-pill ${i===0?'active':''}" id="pill-${i}" onclick="showVariation(${i})">${v.variation_name}</button>`
+      ).join('') + '<div class="pill-indicator" id="pill-indicator"></div>';
+      updateIndicator(0);
+    }
+
+    function updateIndicator(idx) {
+      const pill = document.getElementById(`pill-${idx}`);
+      const indicator = document.getElementById('pill-indicator');
+      if (!pill || !indicator) return;
+      const container = document.getElementById('var-pills');
+      const containerLeft = container.getBoundingClientRect().left;
+      const pillRect = pill.getBoundingClientRect();
+      indicator.style.left = (pillRect.left - containerLeft) + 'px';
+      indicator.style.width = pillRect.width + 'px';
+    }
+
+    function showVariation(idx) {
+      if (idx === activeVarIdx && document.querySelector('.variation-panel.active')) return;
+
+      // Update pills
+      document.querySelectorAll('.var-pill').forEach((p, i) => {
+        p.classList.toggle('active', i === idx);
+      });
+      updateIndicator(idx);
+
+      const v = currentVariations[idx];
+      activeVarIdx = idx;
+
+      // Build new panel HTML
+      const panelId = `var-panel-${idx}`;
+      const existing = document.getElementById(panelId);
+
+      const content = document.getElementById('variation-content');
+
+      // If panel already built, just crossfade to it
+      if (existing) {
+        document.querySelectorAll('.variation-panel.active').forEach(p => {
+          p.classList.remove('active');
+        });
+        existing.classList.add('active');
+        return;
+      }
+
+      // Build panel
+      const panel = document.createElement('div');
+      panel.className = 'variation-panel';
+      panel.id = panelId;
+      panel.innerHTML = buildVariationHTML(v);
+      content.appendChild(panel);
+
+      // Fade out existing, fade in new
+      document.querySelectorAll('.variation-panel.active').forEach(p => p.classList.remove('active'));
+      requestAnimationFrame(() => panel.classList.add('active'));
+
+      cookSteps = v.steps || [];
+      document.getElementById('cook-recipe-title').textContent = `🍳 ${currentDish.name} — ${v.variation_name}`;
+    }
+
+    function buildVariationHTML(v) {
+      const imgSrc = v.image_url || currentDish.reference_image_url || 'images/food-doro.jpg';
+      const meta = [
+        v.prep_time_minutes && `⏱ Prep: ${v.prep_time_minutes} min`,
+        v.cook_time_minutes && `🍳 Cook: ${v.cook_time_minutes} min`,
+        v.servings && `🍽 Serves: ${v.servings}`,
+        v.spice_level && `🌶 ${v.spice_level}`,
+      ].filter(Boolean).join('&nbsp;·&nbsp;');
+
+      // Contributor badge
+      const badge = contributorBadge(v.author_badge || '');
+      const authorHtml = v.author_name
+        ? `<div style="font-family:Georgia,serif;font-size:13px;color:#aaa;margin-bottom:12px;">
+             By <strong style="color:#555;">${v.author_name}</strong>${badge ? ' ' + badge : ''}
+           </div>`
+        : '';
+
+      // Story callout
+      const storyHtml = v.story
+        ? `<div class="story-callout"><span class="story-label">THE STORY</span>${v.story}</div>`
+        : '';
+
+      // Ingredient list with substitute buttons
+      const ingredientsHtml = (v.ingredients || []).map(ing =>
+        `<li>${ing} <button class="sub-btn" title="Can't find this?" onclick="openSubPopover(event,'${ing.replace(/'/g,"\\'")}','${(currentDish.name||'').replace(/'/g,"\\'")}')">🔄</button></li>`
+      ).join('');
+
+      // Diet tags
+      const DIET_LABELS = {fasting_friendly:'☪ Fasting',vegan:'🌱 Vegan',gluten_free:'🌾 Gluten-free',dairy_free:'🥛 Dairy-free',nut_free:'🥜 Nut-free'};
+      const dietTagsHtml = (v.dietary_tags || []).map(t =>
+        `<span style="font-size:11px;border-radius:20px;padding:2px 8px;background:#f0f0f0;color:#666;font-family:Georgia,serif;">${DIET_LABELS[t] || t}</span>`
+      ).join(' ');
+
+      return `
+        ${storyHtml}
+        <div class="recipe-section">
+          <div class="recipe-card">
+            <div class="recipe-image" style="background-image:url(${imgSrc})"></div>
+            <div class="recipe-content">
+              <div class="recipe-header">
+                <h2>Ingredients — ${v.variation_name}</h2>
+              </div>
+              ${authorHtml}
+              ${dietTagsHtml ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${dietTagsHtml}</div>` : ''}
+              ${meta ? `<div class="recipe-meta">${meta}</div>` : ''}
+              ${v.notes ? `<p style="font-family:Georgia,serif;color:#888;font-size:15px;margin-bottom:16px;font-style:italic;">"${v.notes}"</p>` : ''}
+              <ul class="ingredients-list">
+                ${ingredientsHtml}
+              </ul>
+              <button class="cook-mode-btn" onclick="openCookMode()" ${v.steps&&v.steps.length?'':'style="display:none"'}>
+                🍳 Start Cook Mode
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="steps-section">
+          <div class="steps-container">
+            <h2 class="steps-title">Preparation Method</h2>
+            ${(v.steps||[]).map((s,i) => `
+              <label class="step-item">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                <span class="step-text"><strong>${s.title||`Step ${i+1}`}:</strong> ${s.text}</span>
+              </label>`).join('')}
+          </div>
+        </div>`;
+    }
+
+    function contributorBadge(badge) {
+      if (!badge) return '';
+      const map = {'Top Contributor':'badge-top','Regular':'badge-regular','Contributor':'badge-contributor'};
+      const cls = map[badge] || 'badge-contributor';
+      return `<span class="contributor-badge ${cls}">${badge}</span>`;
+    }
+
+    // ── Substitution popover ───────────────────────────────────────────────────
+    function openSubPopover(event, ingredient, dishName) {
+      event.stopPropagation();
+      const popover = document.getElementById('sub-popover');
+      document.getElementById('sub-ingredient-name').textContent = ingredient;
+      document.getElementById('sub-popover-body').textContent = 'Loading…';
+      popover.classList.add('open');
+
+      // Position near the clicked button
+      const rect = event.target.getBoundingClientRect();
+      popover.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+      popover.style.left = Math.min(rect.left, window.innerWidth - 340) + 'px';
+
+      aiSubstitute(ingredient, dishName)
+        .then(data => { document.getElementById('sub-popover-body').textContent = data.substitutes || 'No suggestions.'; })
+        .catch(() => { document.getElementById('sub-popover-body').textContent = 'Could not load suggestions right now.'; });
+    }
+
+    function closeSubPopover() {
+      document.getElementById('sub-popover').classList.remove('open');
+    }
+
+    document.addEventListener('click', e => {
+      const p = document.getElementById('sub-popover');
+      if (p.classList.contains('open') && !p.contains(e.target)) closeSubPopover();
+    });
+
+    function goAddVariation() {
+      if (!isLoggedIn()) {
+        window.location.href = `login.html?next=${encodeURIComponent(window.location.href)}`;
+        return;
+      }
+      window.location.href = `add-recipe.html?mode=variation&slug=${slug}&name=${encodeURIComponent(currentDish?.name||'')}`;
+    }
+
+    // ── Cook Mode ──────────────────────────────────────────────────────────────
+    function openCookMode() {
+      cookIndex = 0;
+      renderCookStep();
+      document.getElementById('cook-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCookMode() {
+      document.getElementById('cook-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+      stopTimer(); resetTimer();
+    }
+
+    function renderCookStep() {
+      const s = cookSteps[cookIndex], total = cookSteps.length;
+      document.getElementById('cook-step-num').textContent = `Step ${cookIndex+1} of ${total}`;
+      document.getElementById('cook-step-title').textContent = s.title || `Step ${cookIndex+1}`;
+      document.getElementById('cook-step-text').textContent = s.text;
+      document.getElementById('cook-prev').disabled = cookIndex === 0;
+      document.getElementById('cook-next').textContent = cookIndex === total-1 ? '🎉 Done!' : 'Next →';
+      document.getElementById('cook-progress').innerHTML = cookSteps.map((_,i) =>
+        `<div class="cook-dot ${i<cookIndex?'done':i===cookIndex?'current':''}"></div>`).join('');
+      stopTimer(); resetTimer();
+    }
+
+    function cookStep(delta) {
+      const next = cookIndex + delta;
+      if (next < 0) return;
+      if (next >= cookSteps.length) { closeCookMode(); return; }
+      cookIndex = next; renderCookStep();
+    }
+
+    // ── Timer ──────────────────────────────────────────────────────────────────
+    let timerSeconds=0, timerInterval=null, timerRunning=false;
+    function setTimer(m) { stopTimer(); timerSeconds=m*60; updateTimerDisplay(); }
+    function toggleTimer() {
+      if (timerRunning) { stopTimer(); return; }
+      if (timerSeconds<=0) timerSeconds=300;
+      timerRunning=true;
+      document.getElementById('timer-start-btn').textContent='⏸ Pause';
+      document.getElementById('timer-start-btn').classList.add('active');
+      timerInterval=setInterval(()=>{
+        if(timerSeconds<=0){stopTimer();document.getElementById('timer-display').style.color='#e74c3c';setTimeout(()=>document.getElementById('timer-display').style.color='#FF9124',3000);return;}
+        timerSeconds--;updateTimerDisplay();
+      },1000);
+    }
+    function stopTimer(){
+      clearInterval(timerInterval);timerRunning=false;
+      const b=document.getElementById('timer-start-btn');
+      if(b){b.textContent='▶ Start';b.classList.remove('active');}
+    }
+    function resetTimer(){stopTimer();timerSeconds=0;updateTimerDisplay();}
+    function updateTimerDisplay(){
+      const m=String(Math.floor(timerSeconds/60)).padStart(2,'0');
+      const s=String(timerSeconds%60).padStart(2,'0');
+      const el=document.getElementById('timer-display');
+      if(el)el.textContent=`${m}:${s}`;
+    }
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

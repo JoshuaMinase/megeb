@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Megeb — Add Recipe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #f8f6f2; }
+    .page-wrap { max-width: 780px; margin: 0 auto; padding: 110px 24px 80px; }
+
+    /* Mode picker */
+    .mode-picker { display: flex; gap: 16px; margin-bottom: 40px; }
+    .mode-btn {
+      flex: 1; padding: 22px 16px; border-radius: 16px;
+      border: 2px solid #e8e8e8; background: #fff;
+      cursor: pointer; text-align: center; transition: all .2s;
+    }
+    .mode-btn:hover { border-color: #FF9124; }
+    .mode-btn.active { border-color: #FF9124; background: #fff8f0; }
+    .mode-btn .icon { font-size: 32px; margin-bottom: 8px; }
+    .mode-btn h3 { font-family: 'Times New Roman',serif; font-size: 18px; color: #263020; margin-bottom: 4px; }
+    .mode-btn p  { font-family: Georgia,serif; font-size: 13px; color: #999; }
+
+    /* Dish search for variation mode */
+    .dish-search-wrap { position: relative; margin-bottom: 24px; }
+    .dish-search-wrap input { width: 100%; padding: 13px 16px; border: 2px solid #e8e8e8; border-radius: 10px; font-size: 16px; font-family: Georgia,serif; color: #263020; outline: none; transition: border-color .25s; }
+    .dish-search-wrap input:focus { border-color: #FF9124; }
+    .dish-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+      border: 2px solid #FF9124; border-top: none; border-radius: 0 0 10px 10px;
+      z-index: 50; max-height: 220px; overflow-y: auto; display: none;
+    }
+    .dish-dropdown.open { display: block; }
+    .dish-option { padding: 12px 16px; cursor: pointer; font-family: Georgia,serif; font-size: 15px; color: #263020; border-bottom: 1px solid #f0f0f0; }
+    .dish-option:hover { background: #fff8f0; }
+    .dish-option small { color: #aaa; font-size: 12px; margin-left: 8px; }
+    .selected-dish-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #263020; color: #fff; border-radius: 30px;
+      padding: 8px 16px; font-family: Georgia,serif; font-size: 14px; margin-bottom: 20px;
+    }
+    .selected-dish-chip button { background: none; border: none; color: rgba(255,255,255,.6); cursor: pointer; font-size: 16px; padding: 0; line-height: 1; }
+
+    /* Progress steps */
+    .steps-nav { display: flex; align-items: center; margin-bottom: 40px; }
+    .step-dot { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+    .step-dot::after { content:''; position:absolute; top:18px; left:50%; width:100%; height:2px; background:#e0e0e0; z-index:0; }
+    .step-dot:last-child::after { display: none; }
+    .step-dot.done::after { background: #263020; }
+    .dot { width:36px;height:36px;border-radius:50%;border:2px solid #e0e0e0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#aaa;position:relative;z-index:1;transition:all .3s; }
+    .dot.active { border-color:#FF9124;background:#FF9124;color:#fff; }
+    .dot.done   { border-color:#263020;background:#263020;color:#fff; }
+    .step-label { font-size:11px;color:#aaa;margin-top:6px;letter-spacing:.5px;font-family:Georgia,serif; }
+    .step-label.active { color:#FF9124; }
+    .step-label.done   { color:#263020; }
+
+    /* Cards */
+    .step-card { background:#fff;border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,.07);padding:40px 44px;display:none; }
+    .step-card.active { display:block; }
+    .card-title { font-size:28px;color:#263020;margin-bottom:6px; }
+    .card-hint  { font-family:Georgia,serif;color:#888;font-size:15px;margin-bottom:32px;line-height:1.5; }
+
+    /* Fields */
+    .field { margin-bottom:24px; }
+    .field label { display:block;font-size:12px;letter-spacing:1px;color:#555;margin-bottom:8px;font-family:Georgia,serif; }
+    .field label span { color:#FF9124; }
+    .field input, .field textarea, .field select { width:100%;padding:13px 16px;border:2px solid #e8e8e8;border-radius:10px;font-size:16px;font-family:Georgia,serif;color:#263020;outline:none;transition:border-color .25s;background:#fff; }
+    .field input:focus, .field textarea:focus { border-color:#FF9124; }
+    .field textarea { resize:vertical;min-height:90px; }
+    .field-row { display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px; }
+
+    /* Image upload */
+    .upload-area { border:2px dashed #ddd;border-radius:12px;cursor:pointer;transition:border-color .25s;overflow:hidden;position:relative;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+    .upload-area:hover { border-color:#FF9124; }
+    .upload-area.has-image { border-style:solid;border-color:#FF9124; }
+    .upload-area input[type=file] { display:none; }
+    .upload-placeholder { text-align:center;padding:30px 20px;pointer-events:none; }
+    .upload-placeholder .icon { font-size:40px;margin-bottom:10px; }
+    .upload-placeholder p { font-family:Georgia,serif;color:#aaa;font-size:15px; }
+    .upload-placeholder small { color:#ccc;font-size:12px; }
+    #img-preview { width:100%;max-height:260px;object-fit:cover;display:none;border-radius:10px; }
+    .change-img-btn { position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;display:none; }
+
+    /* Spice chips */
+    .spice-chips { display:flex;gap:10px;margin-bottom:4px; }
+    .spice-chip { border:2px solid #e8e8e8;border-radius:30px;padding:8px 16px;cursor:pointer;font-family:Georgia,serif;font-size:14px;color:#555;transition:all .2s;background:#fff; }
+    .spice-chip:hover  { border-color:#FF9124;color:#FF9124; }
+    .spice-chip.picked { border-color:#FF9124;background:#FF9124;color:#fff; }
+
+    /* Dynamic lists */
+    .dyn-list { list-style:none;margin-bottom:12px; }
+    .dyn-list li { display:flex;align-items:center;gap:10px;margin-bottom:10px; }
+    .dyn-list li .num { width:28px;height:28px;border-radius:50%;background:#FF9124;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .dyn-list li .num.ing { background:#263020; }
+    .dyn-list li input { flex:1;padding:11px 14px;border:2px solid #e8e8e8;border-radius:8px;font-size:15px;font-family:Georgia,serif;color:#263020;outline:none;transition:border-color .25s; }
+    .dyn-list li input:focus { border-color:#FF9124; }
+    .del-btn { background:none;border:2px solid #eee;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;color:#ccc;flex-shrink:0;transition:all .2s; }
+    .del-btn:hover { border-color:#FF9124;color:#FF9124; }
+    .add-row-btn { background:none;border:2px dashed #FF9124;color:#FF9124;padding:9px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-family:Georgia,serif;transition:all .25s; }
+    .add-row-btn:hover { background:#FF9124;color:#fff; }
+
+    /* Nav buttons */
+    .card-nav { display:flex;justify-content:space-between;align-items:center;margin-top:36px; }
+    .btn-back { background:none;border:2px solid #e0e0e0;color:#888;padding:13px 28px;border-radius:10px;cursor:pointer;font-size:15px;font-family:Georgia,serif;transition:all .25s; }
+    .btn-back:hover { border-color:#263020;color:#263020; }
+    .btn-next { background:#FF9124;border:none;color:#fff;padding:13px 36px;border-radius:10px;cursor:pointer;font-size:16px;font-family:'Times New Roman',serif;transition:background .25s; }
+    .btn-next:hover    { background:#263020; }
+    .btn-next:disabled { background:#ddd;cursor:not-allowed; }
+
+    /* Review */
+    .review-img { width:100%;height:200px;object-fit:cover;border-radius:12px;margin-bottom:20px;display:none; }
+    .review-section { margin-bottom:20px; }
+    .review-section h4 { font-size:13px;letter-spacing:1px;color:#aaa;margin-bottom:8px;font-family:Georgia,serif; }
+    .review-section p, .review-section li { font-family:Georgia,serif;font-size:16px;color:#263020;line-height:1.7; }
+    .review-section ul, .review-section ol { padding-left:20px; }
+
+    .err { background:#fff0f0;color:#c0392b;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px;font-family:Georgia,serif;display:none; }
+    .err.show { display:block; }
+
+    /* Pending success overlay */
+    .success-overlay { display:none;position:fixed;inset:0;background:rgba(255,255,255,.97);z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px; }
+    .success-overlay.show { display:flex; }
+    .success-icon { font-size:70px;margin-bottom:20px; }
+    .success-overlay h2 { font-size:36px;color:#263020;margin-bottom:10px; }
+    .success-overlay p  { font-family:Georgia,serif;color:#888;font-size:17px;margin-bottom:8px; }
+    .success-overlay .pending-note { background:#fff8e6;border-left:4px solid #FF9124;border-radius:8px;padding:14px 20px;font-family:Georgia,serif;font-size:15px;color:#856404;margin:16px 0 28px;text-align:left; }
+    .success-overlay a { display:inline-block;padding:14px 36px;background:#FF9124;color:#fff;border-radius:12px;text-decoration:none;font-size:16px;font-family:'Times New Roman',serif;margin:6px; }
+    .success-overlay a.sec { background:#263020; }
+  </style>
+</head>
+<body>
+
+
+  <header style="position:fixed;background:rgba(255,255,255,.97);padding:15px 60px;box-shadow:0 2px 20px rgba(0,0,0,.06);z-index:100;">
+    <a href="index.html"><img src="images/logo-dark.png" alt="Megeb" style="height:32px;"></a>
+    <nav>
+      <a href="foods.html" style="color:#263020;">← Back to Foods</a>
+      <a href="#" id="nav-logout" onclick="logout()" style="color:#FF9124;display:none;">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Pending success overlay -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="success-icon">⏳</div>
+    <h2 id="success-title">Submitted!</h2>
+    <p id="success-msg">Your submission is now pending review by our team.</p>
+    <div class="pending-note">
+      ✅ We received your submission. Once approved it will appear in the feed — usually within 24 hours.
+    </div>
+    <a href="foods.html">Browse Foods</a>
+    <a href="add-recipe.html" class="sec">Add Another</a>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- Mode picker -->
+    <div class="mode-picker" id="mode-picker">
+      <div class="mode-btn active" id="mode-dish" onclick="setMode('dish')">
+        <div class="icon">🍲</div>
+        <h3>Suggest a new dish</h3>
+        <p>Add a dish that doesn't exist on Megeb yet</p>
+      </div>
+      <div class="mode-btn" id="mode-var" onclick="setMode('variation')">
+        <div class="icon">🧑‍🍳</div>
+        <h3>Add your variation</h3>
+        <p>Share your take on an existing Megeb dish</p>
+      </div>
+    </div>
+
+    <!-- Variation: dish search -->
+    <div id="var-dish-picker" style="display:none;">
+      <div class="field">
+        <label>SEARCH FOR THE DISH <span>*</span></label>
+        <div class="dish-search-wrap">
+          <input type="text" id="dish-search-input" placeholder="Type a dish name, e.g. Firfir…" autocomplete="off" oninput="dishSearchInput()">
+          <div class="dish-dropdown" id="dish-dropdown"></div>
+        </div>
+        <div id="selected-dish-display" style="display:none;">
+          <div class="selected-dish-chip">
+            <span id="selected-dish-name"></span>
+            <button onclick="clearDishSelection()" title="Clear">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="steps-nav" id="steps-nav">
+      <div class="step-dot active" id="dot-1">
+        <div class="dot active">1</div>
+        <span class="step-label active" id="label-1">Basics</span>
+      </div>
+      <div class="step-dot" id="dot-2">
+        <div class="dot">2</div>
+        <span class="step-label" id="label-2">Ingredients</span>
+      </div>
+      <div class="step-dot" id="dot-3">
+        <div class="dot">3</div>
+        <span class="step-label" id="label-3">Steps</span>
+      </div>
+      <div class="step-dot" id="dot-4">
+        <div class="dot">4</div>
+        <span class="step-label" id="label-4">Review</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: Basics -->
+    <div class="step-card active" id="card-1">
+      <h2 class="card-title" id="card1-title">What's the dish? 🍲</h2>
+      <p class="card-hint" id="card1-hint">Give it a name, a short description, and tell us what category it belongs to.</p>
+      <div class="err" id="err-1"></div>
+
+      <!-- Dish-mode fields -->
+      <div id="dish-fields">
+        <div class="field">
+          <label>DISH NAME <span>*</span></label>
+          <input type="text" id="f-name" placeholder="e.g. Doro Wat, Shiro…" maxlength="100">
+        </div>
+        <div class="field">
+          <label>AMHARIC NAME</label>
+          <input type="text" id="f-amharic" placeholder="e.g. ዶሮ ወጥ" maxlength="100">
+        </div>
+        <div class="field">
+          <label>CATEGORY <span>*</span></label>
+          <select id="f-category">
+            <option value="">— select —</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="main">Main</option>
+            <option value="snack">Snack</option>
+            <option value="salad">Salad</option>
+            <option value="condiment">Condiment / Sauce</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>REGION (optional)</label>
+          <input type="text" id="f-region" placeholder="e.g. Gondar, Harar…" maxlength="50">
+        </div>
+        <div class="field">
+          <label>SHORT DESCRIPTION <span>*</span></label>
+          <textarea id="f-desc" placeholder="Describe this dish in 1–2 sentences…" maxlength="500"></textarea>
+        </div>
+      </div>
+
+      <!-- Variation-mode fields -->
+      <div id="var-fields" style="display:none;">
+        <div class="field">
+          <label>VERSION NAME <span>*</span></label>
+          <input type="text" id="f-varname" placeholder="e.g. Classic, Gondar-style, My Grandma's Way…" maxlength="100">
+        </div>
+        <div class="field">
+          <label>SPICE LEVEL</label>
+          <div class="spice-chips">
+            <div class="spice-chip picked" onclick="pickSpice(this)" data-val="mild">🟢 Mild</div>
+            <div class="spice-chip" onclick="pickSpice(this)" data-val="medium">🟡 Medium</div>
+            <div class="spice-chip" onclick="pickSpice(this)" data-val="spicy">🔴 Spicy</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>DIETARY TAGS</label>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-family:Georgia,serif;color:#555;">
+              <input type="checkbox" value="fasting_friendly" class="diet-cb"> ☪ Fasting-friendly
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-family:Georgia,serif;color:#555;">
+              <input type="checkbox" value="vegan" class="diet-cb"> 🌱 Vegan
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-family:Georgia,serif;color:#555;">
+              <input type="checkbox" value="gluten_free" class="diet-cb"> 🌾 Gluten-free
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-family:Georgia,serif;color:#555;">
+              <input type="checkbox" value="dairy_free" class="diet-cb"> 🥛 Dairy-free
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;font-family:Georgia,serif;color:#555;">
+              <input type="checkbox" value="nut_free" class="diet-cb"> 🥜 Nut-free
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label>STORY <small style="color:#aaa;font-weight:normal;">(optional)</small></label>
+          <textarea id="f-story" placeholder="Where did you learn this version? Who taught you? Share the memory behind this dish…" maxlength="1000" style="min-height:110px;"></textarea>
+          <div style="text-align:right;font-size:11px;color:#ccc;margin-top:4px;font-family:Georgia,serif;" id="story-counter">0 / 1000</div>
+        </div>
+        <div class="field">
+          <label>WHAT MAKES THIS VERSION DIFFERENT</label>
+          <textarea id="f-notes" placeholder="Your regional twist, family secret, a specific technique…" maxlength="500"></textarea>
+        </div>
+      </div>
+
+      <!-- Shared: image -->
+      <div class="field">
+        <label>PHOTO</label>
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('img-input').click()">
+          <input type="file" id="img-input" accept="image/jpeg,image/png,image/webp" onchange="handleImagePick(event)">
+          <div class="upload-placeholder" id="upload-placeholder">
+            <div class="icon">📷</div>
+            <p>Tap to add a photo</p>
+            <small>JPG, PNG, WEBP — max 5MB</small>
+          </div>
+          <img id="img-preview" alt="Preview">
+          <button type="button" class="change-img-btn" id="change-img-btn" onclick="event.stopPropagation()">Change photo</button>
+        </div>
+      </div>
+
+      <!-- Shared: times -->
+      <div class="field-row">
+        <div class="field" style="margin-bottom:0">
+          <label>PREP (min)</label>
+          <input type="number" id="f-prep" placeholder="20" min="0">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>COOK (min)</label>
+          <input type="number" id="f-cook" placeholder="40" min="0">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>SERVINGS</label>
+          <input type="number" id="f-serves" placeholder="4" min="1">
+        </div>
+      </div>
+
+      <div class="card-nav">
+        <span></span>
+        <button class="btn-next" onclick="goStep(2)">Next: Ingredients →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Ingredients -->
+    <div class="step-card" id="card-2">
+      <h2 class="card-title">What goes in it? 🧅</h2>
+      <p class="card-hint">List every ingredient with its quantity.</p>
+      <div class="err" id="err-2"></div>
+      <ul class="dyn-list" id="ing-list">
+        <li>
+          <span class="num ing">1</span>
+          <input type="text" placeholder="e.g. 2 large onions, finely chopped">
+          <button type="button" class="del-btn" onclick="delRow(this)">×</button>
+        </li>
+      </ul>
+      <button type="button" class="add-row-btn" onclick="addIng()">+ Add Ingredient</button>
+      <div class="card-nav">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <button class="btn-next" onclick="goStep(3)">Next: Steps →</button>
+      </div>
+    </div>
+
+
+    <!-- STEP 3: Steps -->
+    <div class="step-card" id="card-3">
+      <h2 class="card-title">How do you make it? 👨‍🍳</h2>
+      <p class="card-hint">Walk readers through the process, one step at a time.</p>
+      <div class="err" id="err-3"></div>
+      <ul class="dyn-list" id="steps-list">
+        <li>
+          <span class="num">1</span>
+          <input type="text" placeholder="e.g. Heat oil in a large pan over medium heat…">
+          <button type="button" class="del-btn" onclick="delRow(this)">×</button>
+        </li>
+      </ul>
+      <button type="button" class="add-row-btn" onclick="addStep()">+ Add Step</button>
+      <div class="card-nav">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <button class="btn-next" onclick="goStep(4)">Review →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Review -->
+    <div class="step-card" id="card-4">
+      <h2 class="card-title">Looking good! 🎉</h2>
+      <p class="card-hint">Review before submitting. Your submission goes to moderation first.</p>
+      <div class="err" id="err-4"></div>
+      <img id="review-img" class="review-img" alt="">
+      <div class="review-section">
+        <h4 id="rv-mode-label">DISH</h4>
+        <p><strong id="rv-name"></strong></p>
+        <p style="color:#888;margin-top:6px;" id="rv-desc"></p>
+      </div>
+      <div class="review-section" id="rv-meta-wrap">
+        <h4>DETAILS</h4>
+        <p id="rv-meta" style="color:#888;"></p>
+      </div>
+      <div class="review-section">
+        <h4>INGREDIENTS</h4>
+        <ul id="rv-ings"></ul>
+      </div>
+      <div class="review-section">
+        <h4>STEPS</h4>
+        <ol id="rv-steps"></ol>
+      </div>
+      <div class="card-nav">
+        <button class="btn-back" onclick="goStep(3)">← Edit</button>
+        <button class="btn-next" id="publish-btn" onclick="publish()">🚀 Submit for Review</button>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (!isLoggedIn()) window.location.href = 'login.html?next=add-recipe.html';
+    updateNav();
+
+    let mode = 'dish';         // 'dish' | 'variation'
+    let selectedDish = null;   // { id, slug, name }
+    let selectedSpice = 'mild';
+    let pickedFile = null;
+    let uploadedImageUrl = '';
+    let currentStep = 1;
+
+    // Read URL params for pre-selected variation mode
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'variation') {
+      setMode('variation');
+      if (params.get('slug') && params.get('name')) {
+        selectedDish = { slug: params.get('slug'), name: decodeURIComponent(params.get('name')), id: '' };
+        showSelectedDish();
+      }
+    }
+
+    function setMode(m) {
+      mode = m;
+      document.getElementById('mode-dish').classList.toggle('active', m === 'dish');
+      document.getElementById('mode-var').classList.toggle('active', m === 'variation');
+      document.getElementById('dish-fields').style.display  = m === 'dish' ? '' : 'none';
+      document.getElementById('var-fields').style.display   = m === 'variation' ? '' : 'none';
+      document.getElementById('var-dish-picker').style.display = m === 'variation' ? '' : 'none';
+      document.getElementById('card1-title').textContent = m === 'dish' ? "What's the dish? 🍲" : "Your version 🧑‍🍳";
+      document.getElementById('card1-hint').textContent  = m === 'dish'
+        ? 'Give it a name, a short description, and tell us the category.'
+        : 'Name your version and tell us what makes it special.';
+      document.getElementById('label-1').textContent = m === 'dish' ? 'Basics' : 'Version';
+    }
+
+    // ── Dish search for variation mode ────────────────────────────────────────
+    let searchTimer;
+    async function dishSearchInput() {
+      clearTimeout(searchTimer);
+      const q = document.getElementById('dish-search-input').value.trim();
+      if (q.length < 2) { closeDishDropdown(); return; }
+      searchTimer = setTimeout(async () => {
+        try {
+          const data = await fetchDishes({ search: q, limit: 8 });
+          renderDishDropdown(data.dishes || []);
+        } catch(_) {}
+      }, 300);
+    }
+
+    function renderDishDropdown(items) {
+      const dd = document.getElementById('dish-dropdown');
+      if (!items.length) { closeDishDropdown(); return; }
+      dd.innerHTML = items.map(d =>
+        `<div class="dish-option" onclick="selectDish(${JSON.stringify({id:d.id,slug:d.slug,name:d.name}).replace(/"/g,'&quot;')})">
+          ${d.name}<small>${d.category || ''}</small>
+        </div>`
+      ).join('');
+      dd.classList.add('open');
+    }
+
+    function selectDish(dish) {
+      selectedDish = dish;
+      closeDishDropdown();
+      document.getElementById('dish-search-input').value = '';
+      showSelectedDish();
+    }
+
+    function showSelectedDish() {
+      document.getElementById('selected-dish-name').textContent = selectedDish.name;
+      document.getElementById('selected-dish-display').style.display = '';
+    }
+
+    function clearDishSelection() {
+      selectedDish = null;
+      document.getElementById('selected-dish-display').style.display = 'none';
+    }
+
+    function closeDishDropdown() {
+      document.getElementById('dish-dropdown').classList.remove('open');
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.dish-search-wrap')) closeDishDropdown();
+    });
+
+    // ── Spice chips ───────────────────────────────────────────────────────────
+    function pickSpice(el) {
+      document.querySelectorAll('.spice-chip').forEach(c => c.classList.remove('picked'));
+      el.classList.add('picked');
+      selectedSpice = el.dataset.val;
+    }
+
+    // Story counter
+    document.getElementById('f-story').addEventListener('input', function() {
+      document.getElementById('story-counter').textContent = `${this.value.length} / 1000`;
+    });
+
+    // ── Image ─────────────────────────────────────────────────────────────────
+    function handleImagePick(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      pickedFile = file;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const preview = document.getElementById('img-preview');
+        preview.src = ev.target.result;
+        preview.style.display = 'block';
+        document.getElementById('upload-placeholder').style.display = 'none';
+        document.getElementById('change-img-btn').style.display = 'block';
+        document.getElementById('upload-area').classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ── Dynamic lists ─────────────────────────────────────────────────────────
+    function addIng() {
+      const list = document.getElementById('ing-list');
+      const n = list.children.length + 1;
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="num ing">${n}</span><input type="text" placeholder="e.g. 1 tbsp olive oil"><button type="button" class="del-btn" onclick="delRow(this)">×</button>`;
+      list.appendChild(li);
+      li.querySelector('input').focus();
+    }
+
+    function addStep() {
+      const list = document.getElementById('steps-list');
+      const n = list.children.length + 1;
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="num">${n}</span><input type="text" placeholder="Step ${n}…"><button type="button" class="del-btn" onclick="delRow(this)">×</button>`;
+      list.appendChild(li);
+      li.querySelector('input').focus();
+    }
+
+    function delRow(btn) {
+      const li = btn.closest('li');
+      const list = li.parentElement;
+      if (list.children.length > 1) { li.remove(); reNumber(list); }
+    }
+
+    function reNumber(list) {
+      [...list.children].forEach((li, i) => { const n = li.querySelector('.num'); if (n) n.textContent = i + 1; });
+    }
+
+    // ── Step navigation ───────────────────────────────────────────────────────
+    function goStep(n) {
+      document.getElementById(`err-${currentStep}`)?.classList.remove('show');
+      if (n > currentStep) {
+        const msg = validate(currentStep);
+        if (msg) { showErr(currentStep, msg); return; }
+      }
+      for (let i = 1; i <= 4; i++) {
+        const inner = document.querySelector(`#dot-${i} .dot`);
+        const label = document.getElementById(`label-${i}`);
+        inner.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
+        inner.textContent = i < n ? '✓' : i;
+        label.className = 'step-label' + (i < n ? ' done' : i === n ? ' active' : '');
+        document.getElementById(`dot-${i}`).classList.toggle('done', i < n);
+      }
+      document.getElementById(`card-${currentStep}`).classList.remove('active');
+      currentStep = n;
+      document.getElementById(`card-${currentStep}`).classList.add('active');
+      if (n === 4) buildReview();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function validate(step) {
+      if (step === 1) {
+        if (mode === 'dish') {
+          if (!document.getElementById('f-name').value.trim()) return 'Please enter a dish name.';
+          if (!document.getElementById('f-category').value)    return 'Please select a category.';
+          if (!document.getElementById('f-desc').value.trim()) return 'Please add a short description.';
+        } else {
+          if (!selectedDish) return 'Please search for and select a dish first.';
+          if (!document.getElementById('f-varname').value.trim()) return 'Please name your version.';
+        }
+      }
+      if (step === 2) {
+        if (![...document.querySelectorAll('#ing-list input')].some(i => i.value.trim()))
+          return 'Add at least one ingredient.';
+      }
+      if (step === 3) {
+        if (![...document.querySelectorAll('#steps-list input')].some(i => i.value.trim()))
+          return 'Add at least one step.';
+      }
+      return null;
+    }
+
+    function showErr(step, msg) {
+      const el = document.getElementById(`err-${step}`);
+      el.textContent = msg; el.classList.add('show');
+    }
+
+    // ── Review ────────────────────────────────────────────────────────────────
+    function buildReview() {
+      const img = document.getElementById('review-img');
+      if (pickedFile) { img.src = URL.createObjectURL(pickedFile); img.style.display = 'block'; }
+
+      if (mode === 'dish') {
+        document.getElementById('rv-mode-label').textContent = 'DISH';
+        document.getElementById('rv-name').textContent = document.getElementById('f-name').value;
+        document.getElementById('rv-desc').textContent = document.getElementById('f-desc').value;
+      } else {
+        document.getElementById('rv-mode-label').textContent = `VARIATION OF "${selectedDish?.name}"`;
+        document.getElementById('rv-name').textContent = document.getElementById('f-varname').value;
+        document.getElementById('rv-desc').textContent = document.getElementById('f-notes').value || '—';
+      }
+
+      const meta = [
+        document.getElementById('f-prep').value   && `⏱ Prep: ${document.getElementById('f-prep').value} min`,
+        document.getElementById('f-cook').value   && `🍳 Cook: ${document.getElementById('f-cook').value} min`,
+        document.getElementById('f-serves').value && `🍽 Serves: ${document.getElementById('f-serves').value}`,
+        mode === 'variation' && `🌶 ${selectedSpice}`,
+      ].filter(Boolean).join('  ·  ');
+      document.getElementById('rv-meta').textContent = meta || '—';
+
+      document.getElementById('rv-ings').innerHTML =
+        [...document.querySelectorAll('#ing-list input')]
+          .map(i => i.value.trim()).filter(Boolean).map(t => `<li>${t}</li>`).join('');
+      document.getElementById('rv-steps').innerHTML =
+        [...document.querySelectorAll('#steps-list input')]
+          .map(i => i.value.trim()).filter(Boolean).map(t => `<li style="margin-bottom:8px">${t}</li>`).join('');
+    }
+
+    // ── Publish ───────────────────────────────────────────────────────────────
+    async function publish() {
+      const btn = document.getElementById('publish-btn');
+      btn.disabled = true; btn.textContent = 'Submitting…';
+
+      const ingredients = [...document.querySelectorAll('#ing-list input')].map(i => i.value.trim()).filter(Boolean);
+      const steps = [...document.querySelectorAll('#steps-list input')]
+        .map((i, idx) => ({ title: `Step ${idx + 1}`, text: i.value.trim() })).filter(s => s.text);
+
+      try {
+        // Upload image first if one was picked
+        if (pickedFile) {
+          const res = await uploadImage(pickedFile);
+          uploadedImageUrl = res.url;
+        }
+
+        if (mode === 'dish') {
+          await submitDish({
+            name: document.getElementById('f-name').value.trim(),
+            name_amharic: document.getElementById('f-amharic').value.trim(),
+            category: document.getElementById('f-category').value,
+            region: document.getElementById('f-region').value.trim(),
+            description: document.getElementById('f-desc').value.trim(),
+            reference_image_url: uploadedImageUrl,
+          });
+          document.getElementById('success-title').textContent = 'Dish Submitted!';
+          document.getElementById('success-msg').textContent = 'Your dish suggestion is pending review.';
+        } else {
+          const dietary_tags = [...document.querySelectorAll('.diet-cb:checked')].map(cb => cb.value);
+          await submitVariation(selectedDish.slug, {
+            variation_name: document.getElementById('f-varname').value.trim(),
+            ingredients,
+            steps,
+            image_url: uploadedImageUrl,
+            prep_time_minutes: parseInt(document.getElementById('f-prep').value) || 0,
+            cook_time_minutes: parseInt(document.getElementById('f-cook').value) || 0,
+            servings: parseInt(document.getElementById('f-serves').value) || 2,
+            spice_level: selectedSpice,
+            notes: document.getElementById('f-notes').value.trim(),
+            dietary_tags,
+            story: document.getElementById('f-story').value.trim(),
+          });
+          document.getElementById('success-title').textContent = 'Variation Submitted!';
+          document.getElementById('success-msg').textContent = `Your version of "${selectedDish.name}" is pending review.`;
+        }
+
+        document.getElementById('success-overlay').classList.add('show');
+      } catch (err) {
+        showErr(4, err.message);
+        btn.disabled = false; btn.textContent = '🚀 Submit for Review';
+      }
+    }
+  </script>
+</body>
+</html>
