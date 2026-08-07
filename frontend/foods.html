@@ -157,20 +157,7 @@
     <button onclick="doSearch()">Search</button>
   </div>
 
-  <!-- Category chips -->
-  <div style="padding:0 8% 12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-    <span style="font-family:Georgia,serif;font-size:14px;color:#888;margin-right:4px;">Category:</span>
-    <div id="chips" class="chip-group"></div>
-  </div>
 
-  <!-- Diet chips -->
-  <div style="padding:0 8% 28px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-    <span style="font-family:Georgia,serif;font-size:14px;color:#888;margin-right:4px;">Diet:</span>
-    <div id="diet-chips" class="chip-group"></div>
-    <button id="clear-btn" onclick="clearFilters()"
-      style="display:none;padding:8px 18px;border:2px solid #FF9124;background:none;border-radius:30px;
-             color:#FF9124;font-family:Georgia,serif;font-size:13px;cursor:pointer;">✕ Clear</button>
-  </div>
 
   <!-- Trending -->
   <div id="trending-section">
@@ -234,50 +221,14 @@
       nut_free: '🥜 Nut-free',
     };
 
-    function renderChips() {
-      document.getElementById('chips').innerHTML = CATEGORIES.map(c =>
-        `<span class="chip ${activeCategory===(c==='All'?'':c)?'active':''}" onclick="toggleCat('${c}')">${c.charAt(0).toUpperCase()+c.slice(1)}</span>`
-      ).join('');
-    }
-
-    function renderDietChips() {
-      document.getElementById('diet-chips').innerHTML = Object.entries(DIET_LABELS).map(([val, label]) =>
-        `<span class="chip ${activeDiet===val?'active':''}" onclick="toggleDiet('${val}')">${label}</span>`
-      ).join('');
-    }
-
-    function toggleCat(val) {
-      activeCategory = val === 'All' ? '' : val;
-      updateClearBtn();
-      renderChips();
-      currentPage = 1;
-      runQuery(1);
-    }
-
-    function toggleDiet(val) {
-      activeDiet = activeDiet === val ? '' : val;
-      updateClearBtn();
-      renderDietChips();
-      currentPage = 1;
-      runQuery(1);
-    }
-
-    function updateClearBtn() {
-      document.getElementById('clear-btn').style.display = (activeCategory || activeDiet) ? 'block' : 'none';
-    }
 
     function clearFilters() {
       activeCategory = '';
       activeDiet = '';
-      updateClearBtn();
-      renderChips();
-      renderDietChips();
       currentPage = 1;
       runQuery(1);
     }
 
-    renderChips();
-    renderDietChips();
 
     async function runQuery(page = 1) {
       const grid = document.getElementById('foods-grid');
@@ -401,11 +352,9 @@
     }
     if (params.get('category')) {
       activeCategory = params.get('category');
-      renderChips();
     }
     if (params.get('diet')) {
       activeDiet = params.get('diet');
-      renderDietChips();
     }
 
     loadTrending();
