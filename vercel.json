@@ -32,6 +32,10 @@
     {
       "source": "/health",
       "destination": "https://megeb-backend.onrender.com/health"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ]
 }

@@ -139,11 +139,6 @@ def root():
     return {"status": "Megeb API running"}
 
 @app.get("/health")
-def health():
-    return {"status": "ok"}
-
-
-@app.get("/health")
 async def health():
     try:
         await dishes.find_one({})
