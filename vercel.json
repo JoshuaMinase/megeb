@@ -1,21 +1,30 @@
 {
   "version": 2,
-  "buildCommand": "echo 'No build required'",
-  "outputDirectory": "frontend",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/:path*",
-      "destination": "https://megeb-backend.onrender.com/api/:path*"
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://megeb-backend.onrender.com/api/$1"
     },
     {
-      "source": "/auth/:path*",
-      "destination": "https://megeb-backend.onrender.com/auth/:path*"
+      "src": "/auth/(.*)",
+      "dest": "https://megeb-backend.onrender.com/auth/$1"
     },
     {
-      "source": "/health",
-      "destination": "https://megeb-backend.onrender.com/health"
+      "src": "/health",
+      "dest": "https://megeb-backend.onrender.com/health"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
     }
   ]
 }

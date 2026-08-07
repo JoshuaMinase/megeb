@@ -4,11 +4,11 @@
 
 # Docker
 docker-compose.yml
-Dockerfile
 .dockerignore
 
 # Environment
 .env
+.env.example
 
 # IDE
 .vscode
@@ -23,6 +23,12 @@ Thumbs.db
 # Documentation
 README.md
 AGENTS.md
+RENDER_DEPLOYMENT.md
+VERCEL_DEPLOYMENT.md
 
 # Devin
 .devin
+
+# Frontend (not needed for backend Docker build)
+frontend/
+

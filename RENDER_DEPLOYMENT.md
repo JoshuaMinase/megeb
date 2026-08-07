@@ -1,7 +1,7 @@
 # Render Deployment Guide
 
 ## Overview
-This guide explains how to deploy the Megeb Ethiopian Recipe Platform to Render.com using the provided `render.yaml` configuration.
+This guide explains how to deploy the Megeb backend to Render.com using Docker. The frontend is deployed separately on Vercel for optimal performance.
 
 ## Prerequisites
 - GitHub account with the Megeb repository
@@ -68,17 +68,14 @@ https://your-frontend-url.onrender.com,https://your-backend-url.onrender.com
 ## Services Created
 
 ### Backend Service (`megeb-backend`)
-- **Type**: Python Web Service
-- **Build**: Installs Python dependencies
-- **Start**: Runs FastAPI with Uvicorn
+- **Type**: Docker Web Service
+- **Build**: Uses Dockerfile to build container
+- **Start**: Runs FastAPI with Uvicorn in Docker
 - **Port**: 8000
 - **URL**: `https://megeb-backend.onrender.com`
 
-### Frontend Service (`megeb-frontend`)
-- **Type**: Static Site
-- **Build**: No build required (static HTML/CSS/JS)
-- **Publish Directory**: `frontend/`
-- **URL**: `https://megeb-frontend.onrender.com`
+### Note on Frontend
+The frontend is deployed separately on Vercel for optimal performance. See [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) for frontend deployment instructions.
 
 ## Post-Deployment Setup
 
