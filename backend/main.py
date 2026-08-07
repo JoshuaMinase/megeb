@@ -32,16 +32,58 @@ from database import recipes, dishes, recipe_variations, collections
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await recipes.create_index([("name", "text"), ("description", "text"), ("nationality", "text")])
-    await recipes.create_index("nationality")
-    await recipes.create_index("created_at")
-    await dishes.create_index([("name", "text"), ("name_amharic", "text"), ("category", "text")])
-    await dishes.create_index("slug", unique=True)
-    await recipe_variations.create_index([("ingredients", "text"), ("notes", "text")])
-    await recipe_variations.create_index("dish_id")
-    await recipe_variations.create_index("dietary_tags")
-    await collections.create_index("slug", unique=True)
-    yield
+    try:
+        # Create indexes with error handling
+        try:
+            await recipes.create_index([("name", "text"), ("description", "text"), ("nationality", "text")])
+        except Exception:
+            pass  # Index may already exist
+        
+        try:
+            await recipes.create_index("nationality")
+        except Exception:
+            pass
+        
+        try:
+            await recipes.create_index("created_at")
+        except Exception:
+            pass
+        
+        try:
+            await dishes.create_index([("name", "text"), ("name_amharic", "text"), ("category", "text")])
+        except Exception:
+            pass
+        
+        try:
+            await dishes.create_index("slug", unique=True)
+        except Exception:
+            pass
+        
+        try:
+            await recipe_variations.create_index([("ingredients", "text"), ("notes", "text")])
+        except Exception:
+            pass
+        
+        try:
+            await recipe_variations.create_index("dish_id")
+        except Exception:
+            pass
+        
+        try:
+            await recipe_variations.create_index("dietary_tags")
+        except Exception:
+            pass
+        
+        try:
+            await collections.create_index("slug", unique=True)
+        except Exception:
+            pass
+        
+        yield
+    except Exception as e:
+        # Log the error but don't fail startup
+        print(f"Warning: Index creation failed: {e}")
+        yield
 
 
 app = FastAPI(title="Megeb API", lifespan=lifespan)
