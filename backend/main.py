@@ -15,7 +15,7 @@ load_dotenv()
 _REQUIRED = ["GROQ_API_KEY", "JWT_SECRET", "MONGO_URL"]
 _missing = [k for k in _REQUIRED if not os.environ.get(k)]
 if _missing:
-    raise RuntimeError(f"Missing required env vars: {', '.join(_missing)}")
+    print(f"WARNING: Missing env vars: {', '.join(_missing)}. Some features may not work.")
 
 from routes.auth_routes import router as auth_router
 from routes.recipe_routes import router as recipe_router
@@ -137,6 +137,10 @@ app.include_router(collections_router)
 @app.get("/api")
 def root():
     return {"status": "Megeb API running"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.get("/health")
