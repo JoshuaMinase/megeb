@@ -1,5 +1,5 @@
 services:
-  # Backend API Service
+  # Backend API Service only (Frontend deployed on Vercel)
   - type: web
     name: megeb-backend
     env: python
@@ -22,12 +22,4 @@ services:
       - key: CLOUDINARY_API_SECRET
         sync: false
       - key: CORS_ORIGINS
-        value: https://megeb-frontend.onrender.com,https://megeb-backend.onrender.com # Update after deployment with actual URLs
-
-  # Frontend Static Site
-  - type: web
-    name: megeb-frontend
-    env: static
-    plan: free
-    buildCommand: echo "No build required for static HTML"
-    staticPublishPath: ./frontend
+        value: https://megeb-backend.onrender.com,https://your-vercel-app.vercel.app # Update with actual Vercel URL

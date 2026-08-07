@@ -15,6 +15,10 @@ if (hostname === 'localhost' || hostname === '127.0.0.1') {
 else if (hostname.includes('onrender.com')) {
   API_BASE_URL = 'https://megeb-backend.onrender.com';
 }
+// Vercel deployment
+else if (hostname.includes('vercel.app')) {
+  API_BASE_URL = 'https://megeb-backend.onrender.com';
+}
 // Other environments (custom domain)
 else {
   API_BASE_URL = ''; // Same-origin

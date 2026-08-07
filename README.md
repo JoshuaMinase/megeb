@@ -135,88 +135,115 @@ python -m http.server 3000
 
 ---
 
-## Render Deployment
+## Hybrid Deployment (Recommended)
 
-📄 **Detailed deployment guide available in [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)**
+### Architecture
+- **Frontend**: Vercel (static site with global CDN)
+- **Backend**: Render (Python FastAPI web service)
+- **Database**: MongoDB Atlas (shared between both)
 
-### Quick Deploy to Render
+### Quick Deploy
 
-1. **Push your code to GitHub**
-   ```bash
-   git add .
-   git commit -m "Add Render deployment configuration"
-   git push origin main
-   ```
+#### 1. Deploy Backend to Render
+📄 **Detailed guide: [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)**
 
-2. **Create Render account**
-   - Go to [render.com](https://render.com) and sign up
-   - Connect your GitHub repository
+```bash
+# Push to GitHub
+git add .
+git commit -m "Add deployment configuration"
+git push origin main
 
-3. **Deploy using render.yaml**
-   - Render will automatically detect the `render.yaml` file
-   - It will create two services: `megeb-backend` and `megeb-frontend`
-   - The backend will be deployed as a Python web service
-   - The frontend will be deployed as a static site
+# Deploy to Render using render.yaml
+# Backend will be deployed as Python web service
+```
 
-4. **Configure Environment Variables**
-   In your Render dashboard, set these environment variables for the backend service:
-   
-   Required:
-   - `MONGO_URL`: Your MongoDB Atlas connection string
-   - `GROQ_API_KEY`: Your Groq API key for AI features
-   - `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
-   - `CLOUDINARY_API_KEY`: Your Cloudinary API key
-   - `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
-   
-   Auto-generated:
-   - `JWT_SECRET`: Render will auto-generate this
-   
-   Pre-configured:
-   - `CORS_ORIGINS`: Set to your Render URLs
-   - `PORT`: Set to 8000
+**Backend URL**: `https://megeb-backend.onrender.com`
 
-5. **Access your application**
+#### 2. Deploy Frontend to Vercel
+📄 **Detailed guide: [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)**
+
+```bash
+# Import repository in Vercel
+# Vercel will auto-detect vercel.json
+# Frontend will be deployed as static site
+```
+
+**Frontend URL**: `https://your-app.vercel.app`
+
+#### 3. Configure CORS
+After both deployments, update backend CORS origins:
+```
+https://megeb-backend.onrender.com,https://your-vercel-app.vercel.app
+```
+
+### Benefits of Hybrid Deployment
+- ✅ **Performance**: Vercel's global CDN for static assets
+- ✅ **Cost**: Both platforms have generous free tiers
+- ✅ **Scalability**: Scale frontend and backend independently
+- ✅ **Reliability**: Redundant deployment across platforms
+- ✅ **Developer Experience**: Excellent DX on both platforms
+
+---
+
+## Alternative: All-in-One Render Deployment
+
+📄 **Detailed guide: [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)**
+
+If you prefer to deploy both frontend and backend on Render:
+
+1. **Deploy using render.yaml**
+   - Render will create both services
+   - Frontend: Static site
+   - Backend: Python web service
+
+2. **Access your application**
    - Frontend: `https://megeb-frontend.onrender.com`
-   - Backend API: `https://megeb-backend.onrender.com`
-
-### Manual Render Setup (Alternative)
-
-If you prefer to set up Render manually without `render.yaml`:
-
-**Backend Service:**
-- Type: Web Service
-- Environment: Python
-- Build Command: `pip install -r requirements.txt`
-- Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-- Working Directory: `backend`
-
-**Frontend Service:**
-- Type: Static Site
-- Build Command: `echo "No build required"`
-- Publish Directory: `frontend`
-
-### Post-Deployment Setup
-
-1. **Update CORS Origins**
-   - After deployment, update the `CORS_ORIGINS` environment variable
-   - Include both your frontend and backend Render URLs
-
-2. **Set up Admin User**
-   - Connect to MongoDB Atlas
-   - Promote a user to admin:
-   ```javascript
-   db.users.updateOne({ email: "your@email.com" }, { $set: { role: "admin" } })
-   ```
-
-3. **Custom Domain (Optional)**
-   - Add custom domains in Render dashboard
-   - Update CORS origins to include your custom domain
-   - Update `frontend/js/config.js` if needed
+   - Backend: `https://megeb-backend.onrender.com`
 
 ### Render-Specific Considerations
 
 - **Free Tier**: Render's free tier has spin-up time (services sleep when inactive)
-- **Environment Variables**: Must be set in Render dashboard, not in `.env` file
-- **Database**: Use MongoDB Atlas for best performance with Render
-- **File Storage**: Use Cloudinary for image uploads (Render has ephemeral filesystem)
-- **Logging**: Check Render dashboard for logs and monitoring
+- **Environment Variables**: Must be set in Render dashboard
+- **Database**: Use MongoDB Atlas for best performance
+- **File Storage**: Use Cloudinary for image uploads
+- **Logging**: Check Render dashboard for logs
+
+---
+
+## Environment Configuration
+
+### Required Environment Variables
+
+For both deployment methods, configure these in your platform's dashboard:
+
+**Database:**
+- `MONGO_URL`: MongoDB Atlas connection string
+
+**Authentication:**
+- `JWT_SECRET`: Auto-generated by Render (set manually for other platforms)
+
+**AI Features:**
+- `GROQ_API_KEY`: Your Groq API key for AI recipe generation
+
+**Image Storage:**
+- `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
+- `CLOUDINARY_API_KEY`: Your Cloudinary API key
+- `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
+
+**CORS:**
+- `CORS_ORIGINS`: Comma-separated list of allowed origins
+
+### Environment-Specific Notes
+
+**Local Development:**
+- Use `.env` file (not committed to git)
+- See `.env.example` for template
+
+**Render:**
+- Set in Render dashboard
+- Auto-generated for JWT_SECRET
+- Manual entry for other variables
+
+**Vercel:**
+- Frontend doesn't require environment variables
+- Backend (on Render) handles all environment config

@@ -6,6 +6,9 @@ backend/.env
 # Render
 .renderignore
 
+# Vercel
+.vercel
+
 # Python
 __pycache__/
 *.pyc
