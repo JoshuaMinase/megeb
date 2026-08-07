@@ -1,0 +1,33 @@
+services:
+  # Backend API Service
+  - type: web
+    name: megeb-backend
+    env: python
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: MONGO_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://megeb-frontend.onrender.com,https://megeb-backend.onrender.com # Update after deployment with actual URLs
+
+  # Frontend Static Site
+  - type: web
+    name: megeb-frontend
+    env: static
+    plan: free
+    buildCommand: echo "No build required for static HTML"
+    staticPublishPath: ./frontend

@@ -1,6 +1,7 @@
 // Megeb AI — "What Ethiopian food can I make with these ingredients?"
 (function () {
-  const API = 'http://localhost:8000';
+  // Use config.js API_BASE_URL; fall back to empty string (same-origin) if not loaded
+  const API = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
 
   const css = `
     #ai-btn {

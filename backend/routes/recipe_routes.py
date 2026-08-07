@@ -88,7 +88,7 @@ async def search_recipes(
     docs  = await recipes.find(query).skip(skip).limit(limit).to_list(limit)
     total = await recipes.count_documents(query)
 
-    # log search for trending
+    # log search for trending — store recipe_id as ObjectId for consistent lookup
     if docs:
         log_entries = [
             {"query": q, "recipe_id": d["_id"],

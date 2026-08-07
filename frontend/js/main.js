@@ -178,3 +178,27 @@
     document.querySelectorAll('.recipe-card, .trending-card, .food-card').forEach(c => c.style.transform = '');
   });
 })();
+
+
+// ===== SCROLL-TO-TOP BUTTON =====
+(function () {
+  const btn = document.createElement('button');
+  btn.id = 'scroll-top-btn';
+  btn.title = 'Back to top';
+  btn.setAttribute('aria-label', 'Scroll to top');
+  btn.innerHTML = '↑';
+  document.body.appendChild(btn);
+
+  // Show after scrolling 400px
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();

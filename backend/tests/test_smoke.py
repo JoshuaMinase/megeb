@@ -1,12 +1,11 @@
 """
 Smoke tests — run from backend/:
-    pip install pytest httpx
+    pip install pytest pytest-anyio httpx anyio
     pytest tests/test_smoke.py -v
 Requires the FastAPI app to import cleanly; MongoDB/env vars must be set.
 """
 import os
 import sys
-import io
 import pytest
 
 # Allow importing from backend/
@@ -22,19 +21,13 @@ from main import app
 BASE = "http://test"
 TRANSPORT = ASGITransport(app=app)
 
-
-# ─── Fixtures ─────────────────────────────────────────────────────────────────
-
-@pytest.fixture(scope="module")
-def anyio_backend():
-    return "asyncio"
+# Mark every test in this module as anyio so we don't need @pytest.mark.anyio on each one
+pytestmark = pytest.mark.anyio
 
 
-async def _client():
-    return AsyncClient(transport=TRANSPORT, base_url=BASE)
+# ─── Helpers ──────────────────────────────────────────────────────────────────
 
-
-async def _register(client, suffix=""):
+async def _register(client: AsyncClient, suffix: str = "") -> dict:
     email = f"smoke{suffix}@test.com"
     r = await client.post("/auth/signup", json={
         "name": f"Smoke{suffix}", "email": email, "password": "Test1234!", "nationality": "Ethiopian"
@@ -42,7 +35,7 @@ async def _register(client, suffix=""):
     # If already registered, log in instead
     if r.status_code == 400:
         r = await client.post("/auth/login", json={"email": email, "password": "Test1234!"})
-    assert r.status_code in (200, 201)
+    assert r.status_code in (200, 201), f"Register/login failed: {r.text}"
     return r.json()
 
 

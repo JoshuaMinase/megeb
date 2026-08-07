@@ -438,12 +438,21 @@
     async function dishSearchInput() {
       clearTimeout(searchTimer);
       const q = document.getElementById('dish-search-input').value.trim();
+      const dd = document.getElementById('dish-dropdown');
       if (q.length < 2) { closeDishDropdown(); return; }
       searchTimer = setTimeout(async () => {
         try {
           const data = await fetchDishes({ search: q, limit: 8 });
-          renderDishDropdown(data.dishes || []);
-        } catch(_) {}
+          const dishes = data.dishes || [];
+          if (!dishes.length) {
+            dd.innerHTML = '<div class="dish-option" style="color:#aaa;cursor:default;">No dishes found — try a different name</div>';
+            dd.classList.add('open');
+          } else {
+            renderDishDropdown(dishes);
+          }
+        } catch (e) {
+          closeDishDropdown();
+        }
       }, 300);
     }
 
@@ -451,10 +460,23 @@
       const dd = document.getElementById('dish-dropdown');
       if (!items.length) { closeDishDropdown(); return; }
       dd.innerHTML = items.map(d =>
-        `<div class="dish-option" onclick="selectDish(${JSON.stringify({id:d.id,slug:d.slug,name:d.name}).replace(/"/g,'&quot;')})">
+        `<div class="dish-option"
+              data-id="${encodeURIComponent(d.id || '')}"
+              data-slug="${encodeURIComponent(d.slug || '')}"
+              data-name="${encodeURIComponent(d.name || '')}">
           ${d.name}<small>${d.category || ''}</small>
         </div>`
       ).join('');
+      // Use event delegation — attach click on the container
+      dd.querySelectorAll('.dish-option').forEach(el => {
+        el.addEventListener('click', () => {
+          selectDish({
+            id: decodeURIComponent(el.dataset.id),
+            slug: decodeURIComponent(el.dataset.slug),
+            name: decodeURIComponent(el.dataset.name),
+          });
+        });
+      });
       dd.classList.add('open');
     }
 

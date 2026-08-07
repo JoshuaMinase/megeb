@@ -53,6 +53,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(","),
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -110,5 +111,8 @@ uploads_path = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
-frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
-app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+# Frontend is served by nginx in production, but can be mounted locally for development
+# On Render, we don't mount the frontend as it's a separate service
+if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))):
+    frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
+    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")

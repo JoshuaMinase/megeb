@@ -32,12 +32,24 @@ async def trending_dishes(limit: int = Query(8, le=20)):
     pipeline = [
         {"$group": {"_id": "$dish_id", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
-        {"$limit": limit},
-        {"$addFields": {"dish_oid": {"$toObjectId": "$_id"}}},
-        {"$lookup": {"from": "dishes", "localField": "dish_oid", "foreignField": "_id", "as": "dish"}},
-        {"$unwind": "$dish"},
+        {"$limit": limit * 2},  # over-fetch to account for non-approved dishes
+        {
+            "$lookup": {
+                "from": "dishes",
+                "let": {"did": "$_id"},
+                "pipeline": [
+                    {"$match": {"$expr": {"$or": [
+                        {"$eq": ["$_id", "$$did"]},
+                        {"$eq": [{"$toString": "$_id"}, {"$toString": "$$did"}]},
+                    ]}}},
+                ],
+                "as": "dish",
+            }
+        },
+        {"$unwind": {"path": "$dish", "preserveNullAndEmptyArrays": False}},
         {"$match": {"dish.status": "approved"}},
         {"$replaceRoot": {"newRoot": "$dish"}},
+        {"$limit": limit},
     ]
     docs = await searches.aggregate(pipeline).to_list(limit)
     if not docs:
@@ -67,12 +79,42 @@ async def list_dishes(
                 "dish_id",
                 {"status": "approved", "dietary_tags": {"$all": tags}},
             )
-            query["_id"] = {"$in": [ObjectId(did) for did in matching_vars if ObjectId.is_valid(did)]}
+            # distinct returns a mix of ObjectId and str — normalise to ObjectId only
+            oid_set = set()
+            for did in matching_vars:
+                s = str(did)
+                if ObjectId.is_valid(s):
+                    oid_set.add(ObjectId(s))
+            query["_id"] = {"$in": list(oid_set)}
 
     skip = (page - 1) * limit
     total = await dishes.count_documents(query)
     cursor = dishes.find(query).sort("variation_count", -1).skip(skip).limit(limit)
     docs = await cursor.to_list(limit)
+
+    # Compute top_tags: for each dish, find the union of dietary_tags across approved variations
+    if docs:
+        dish_ids_str = [str(d["_id"]) for d in docs]
+        # Query variations matching by both str and ObjectId dish_id
+        tags_cursor = recipe_variations.find(
+            {"$or": [
+                {"dish_id": {"$in": dish_ids_str}},
+                {"dish_id": {"$in": [d["_id"] for d in docs]}},
+            ], "status": "approved", "dietary_tags": {"$exists": True, "$ne": []}},
+            {"dish_id": 1, "dietary_tags": 1},
+        )
+        tags_by_dish: dict = {}
+        async for v in tags_cursor:
+            key = str(v["dish_id"])
+            if key not in tags_by_dish:
+                tags_by_dish[key] = {}
+            for t in (v.get("dietary_tags") or []):
+                tags_by_dish[key][t] = tags_by_dish[key].get(t, 0) + 1
+        # Attach sorted top_tags (up to 3 most common) to each dish doc
+        for d in docs:
+            counts = tags_by_dish.get(str(d["_id"]), {})
+            d["top_tags"] = sorted(counts, key=counts.get, reverse=True)[:3]
+
     return {
         "dishes": [_dish_out(d) for d in docs],
         "total": total,
@@ -97,10 +139,11 @@ async def get_dish(slug: str):
     if not dish:
         raise HTTPException(status_code=404, detail="Dish not found")
     await dishes.update_one({"_id": dish["_id"]}, {"$inc": {"search_count": 1}})
-    await searches.insert_one({"dish_id": str(dish["_id"]), "at": datetime.now(timezone.utc)})
+    await searches.insert_one({"dish_id": dish["_id"], "at": datetime.now(timezone.utc)})
 
+    # Support both ObjectId and str dish_id for backwards-compat
     variations = await recipe_variations.find(
-        {"dish_id": str(dish["_id"]), "status": "approved"}
+        {"$or": [{"dish_id": dish["_id"]}, {"dish_id": str(dish["_id"])}], "status": "approved"}
     ).to_list(50)
     return {**_dish_out(dish), "variations": [_var_out(v) for v in variations]}
 

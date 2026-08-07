@@ -45,16 +45,31 @@
 
     /* ── Variation content area ───────────────────────────────────────────── */
     .variation-content {
-      position: relative; overflow: hidden;
+      position: relative;
     }
+    /* Inactive panels are hidden but keep their height in the flow to avoid flicker.
+       We use visibility+opacity so the container never collapses. */
     .variation-panel {
-      opacity: 0; transform: translateY(12px);
-      pointer-events: none; position: absolute; top: 0; left: 0; right: 0;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      /* Keep in flow but invisible so the container holds its height */
+      visibility: hidden;
+      position: absolute;
+      top: 0; left: 0; right: 0;
       transition: opacity .28s ease-out, transform .28s ease-out;
     }
     .variation-panel.active {
-      opacity: 1; transform: translateY(0);
-      pointer-events: auto; position: relative;
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      visibility: visible;
+      position: relative;
+    }
+    /* Spacer so container height = active panel height during crossfade */
+    .variation-content-sizer {
+      visibility: hidden;
+      pointer-events: none;
     }
 
     /* ── Dish info strip ─────────────────────────────────────────────────── */
@@ -436,31 +451,28 @@
       const v = currentVariations[idx];
       activeVarIdx = idx;
 
-      // Build new panel HTML
-      const panelId = `var-panel-${idx}`;
-      const existing = document.getElementById(panelId);
-
       const content = document.getElementById('variation-content');
+      const panelId = `var-panel-${idx}`;
+      let panel = document.getElementById(panelId);
 
-      // If panel already built, just crossfade to it
-      if (existing) {
-        document.querySelectorAll('.variation-panel.active').forEach(p => {
-          p.classList.remove('active');
-        });
-        existing.classList.add('active');
-        return;
+      // Build panel HTML if not yet built
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.className = 'variation-panel';
+        panel.id = panelId;
+        panel.innerHTML = buildVariationHTML(v);
+        content.appendChild(panel);
       }
 
-      // Build panel
-      const panel = document.createElement('div');
-      panel.className = 'variation-panel';
-      panel.id = panelId;
-      panel.innerHTML = buildVariationHTML(v);
-      content.appendChild(panel);
+      // Crossfade: deactivate current, activate new
+      const outgoing = content.querySelector('.variation-panel.active');
+      if (outgoing && outgoing !== panel) {
+        outgoing.classList.remove('active');
+      }
 
-      // Fade out existing, fade in new
-      document.querySelectorAll('.variation-panel.active').forEach(p => p.classList.remove('active'));
-      requestAnimationFrame(() => panel.classList.add('active'));
+      requestAnimationFrame(() => {
+        panel.classList.add('active');
+      });
 
       cookSteps = v.steps || [];
       document.getElementById('cook-recipe-title').textContent = `🍳 ${currentDish.name} — ${v.variation_name}`;
@@ -549,10 +561,19 @@
       document.getElementById('sub-popover-body').textContent = 'Loading…';
       popover.classList.add('open');
 
-      // Position near the clicked button
+      // Position near the clicked button, clamped to viewport
       const rect = event.target.getBoundingClientRect();
-      popover.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-      popover.style.left = Math.min(rect.left, window.innerWidth - 340) + 'px';
+      const popoverWidth = 320;
+      const margin = 8;
+      let top = rect.bottom + window.scrollY + margin;
+      let left = rect.left + window.scrollX;
+
+      // Clamp horizontally so it doesn't overflow viewport
+      const maxLeft = window.innerWidth - popoverWidth - margin;
+      left = Math.max(margin, Math.min(left, maxLeft));
+
+      popover.style.top = top + 'px';
+      popover.style.left = left + 'px';
 
       aiSubstitute(ingredient, dishName)
         .then(data => { document.getElementById('sub-popover-body').textContent = data.substitutes || 'No suggestions.'; })
@@ -610,30 +631,55 @@
     }
 
     // ── Timer ──────────────────────────────────────────────────────────────────
-    let timerSeconds=0, timerInterval=null, timerRunning=false;
-    function setTimer(m) { stopTimer(); timerSeconds=m*60; updateTimerDisplay(); }
+    let timerSeconds = 0, timerInterval = null, timerRunning = false;
+
+    function setTimer(m) {
+      stopTimer();
+      timerSeconds = m * 60;
+      updateTimerDisplay();
+    }
+
     function toggleTimer() {
       if (timerRunning) { stopTimer(); return; }
-      if (timerSeconds<=0) timerSeconds=300;
-      timerRunning=true;
-      document.getElementById('timer-start-btn').textContent='⏸ Pause';
-      document.getElementById('timer-start-btn').classList.add('active');
-      timerInterval=setInterval(()=>{
-        if(timerSeconds<=0){stopTimer();document.getElementById('timer-display').style.color='#e74c3c';setTimeout(()=>document.getElementById('timer-display').style.color='#FF9124',3000);return;}
-        timerSeconds--;updateTimerDisplay();
-      },1000);
+      if (timerSeconds <= 0) timerSeconds = 300; // default 5 min
+      timerRunning = true;
+      const btn = document.getElementById('timer-start-btn');
+      if (btn) { btn.textContent = '⏸ Pause'; btn.classList.add('active'); }
+      timerInterval = setInterval(() => {
+        if (timerSeconds <= 0) {
+          stopTimer();
+          const disp = document.getElementById('timer-display');
+          if (disp) {
+            disp.style.color = '#e74c3c';
+            disp.textContent = '00:00';
+            setTimeout(() => { disp.style.color = '#FF9124'; }, 3000);
+          }
+          return;
+        }
+        timerSeconds--;
+        updateTimerDisplay();
+      }, 1000);
     }
-    function stopTimer(){
-      clearInterval(timerInterval);timerRunning=false;
-      const b=document.getElementById('timer-start-btn');
-      if(b){b.textContent='▶ Start';b.classList.remove('active');}
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerRunning = false;
+      const btn = document.getElementById('timer-start-btn');
+      if (btn) { btn.textContent = '▶ Start'; btn.classList.remove('active'); }
     }
-    function resetTimer(){stopTimer();timerSeconds=0;updateTimerDisplay();}
-    function updateTimerDisplay(){
-      const m=String(Math.floor(timerSeconds/60)).padStart(2,'0');
-      const s=String(timerSeconds%60).padStart(2,'0');
-      const el=document.getElementById('timer-display');
-      if(el)el.textContent=`${m}:${s}`;
+
+    function resetTimer() {
+      stopTimer();
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      const el = document.getElementById('timer-display');
+      if (el) el.textContent = `${m}:${s}`;
     }
   </script>
   <script src="js/main.js"></script>

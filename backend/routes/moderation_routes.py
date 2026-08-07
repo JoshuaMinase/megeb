@@ -92,10 +92,13 @@ async def moderate_variation(variation_id: str, body: ModerationBody, admin=Depe
     )
 
     if body.action == "approve":
-        await dishes.update_one({"_id": ObjectId(var["dish_id"])}, {"$inc": {"variation_count": 1}})
-        if var.get("author_id") and ObjectId.is_valid(var["author_id"]):
+        dish_id_val = var["dish_id"]
+        if isinstance(dish_id_val, str) and ObjectId.is_valid(dish_id_val):
+            dish_id_val = ObjectId(dish_id_val)
+        await dishes.update_one({"_id": dish_id_val}, {"$inc": {"variation_count": 1}})
+        if var.get("author_id") and ObjectId.is_valid(str(var["author_id"])):
             await users.update_one(
-                {"_id": ObjectId(var["author_id"])},
+                {"_id": ObjectId(str(var["author_id"]))},
                 {"$inc": {"variations_approved_count": 1}},
             )
 
