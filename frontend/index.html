@@ -67,7 +67,7 @@
         <a href="foods.html" class="zj-btn">Explore Our Recipes</a>
       </div>
       <div class="zj-visual-block zj-reveal-delay">
-        <img src="images/food-photo-1.png" alt="Traditional Ethiopian food">
+        <img src="images/food-photo-1.png" alt="Traditional Ethiopian food" class="chef-char" id="chef1">
       </div>
     </div>
   </section>
@@ -135,7 +135,7 @@
   <section class="zj-section zj-section-alt">
     <div class="zj-section-inner">
       <div class="zj-visual-block zj-reveal">
-        <img src="images/food-photo-2.png" alt="Ethiopian cooking">
+        <img src="images/food-photo-2.png" alt="Ethiopian cooking" class="chef-char" id="chef2">
       </div>
       <div class="zj-text-block zj-reveal-delay">
         <span class="zj-tag">Our Story</span>
@@ -275,6 +275,44 @@
     }).catch(() => {});
   </script>
   <script src="js/main.js"></script>
+
+  <script>
+    /* ── Scroll-driven character rotation ─────────────────────────
+       Each chef image rotates the same fixed amount (ROTATE_DEG)
+       as you scroll through their parent section.
+       Progress 0 → start of section entering viewport
+       Progress 1 → section fully scrolled past
+    ──────────────────────────────────────────────────────────────── */
+    (function () {
+      const ROTATE_DEG = 15;   // total degrees to rotate while scrolling through section
+      const START_DEG  = -8;   // resting tilt before scroll begins
+
+      const chefs = [
+        { img: document.getElementById('chef1'), section: document.getElementById('chef1')?.closest('section') },
+        { img: document.getElementById('chef2'), section: document.getElementById('chef2')?.closest('section') },
+      ].filter(c => c.img && c.section);
+
+      function getScrollProgress(el) {
+        const rect  = el.getBoundingClientRect();
+        const vh    = window.innerHeight;
+        // 0 when top of section hits bottom of viewport, 1 when bottom of section hits top
+        const total = rect.height + vh;
+        const gone  = vh - rect.top;
+        return Math.min(1, Math.max(0, gone / total));
+      }
+
+      function onScroll() {
+        chefs.forEach(({ img, section }) => {
+          const p   = getScrollProgress(section);
+          const deg = START_DEG + p * ROTATE_DEG;
+          img.style.transform = `rotate(${deg.toFixed(2)}deg)`;
+        });
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll(); // apply on load
+    })();
+  </script>
 
 </body>
 </html>

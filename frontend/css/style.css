@@ -1218,3 +1218,29 @@ header.sticky {
     background: #fff !important;
   }
 }
+
+
+/* ── Chef character illustrations ─────────────────────────────── */
+.chef-char {
+  /* Kill the white canvas without re-exporting — white becomes transparent */
+  mix-blend-mode: multiply;
+
+  /* Sizing — let them fill the visual block naturally */
+  width: 100%;
+  max-width: 460px;
+
+  /* Rotation origin: bottom-centre so they spin from their feet */
+  transform-origin: bottom center;
+
+  /* Smooth transition for JS-driven rotation */
+  transition: transform 0.08s linear;
+
+  /* No border-radius / box-shadow on the character */
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Make the visual block background transparent so mix-blend works */
+.zj-visual-block {
+  background: transparent !important;
+}
