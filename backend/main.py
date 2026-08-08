@@ -168,3 +168,104 @@ async def seed_recipes_endpoint(secret: str):
         capture_output=True, text=True, cwd="/app"
     )
     return {"stdout": result.stdout, "stderr": result.stderr, "returncode": result.returncode}
+
+
+
+@app.post("/internal/fix-images")
+async def fix_images_endpoint(secret: str):
+    if secret != "megeb-seed-2024":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    # Reliable image URLs from Wikimedia Commons (direct file links that allow hotlinking)
+    IMAGES = {
+        "Doro Wat":         "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Siga Wat":         "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Misir Wat":        "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ful_medames.jpg",
+        "Shiro Wat":        "https://upload.wikimedia.org/wikipedia/commons/5/5e/Shiro_be_kibbeh.jpg",
+        "Alicha Wat":       "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Kik Alicha":       "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ful_medames.jpg",
+        "Atkilt Wat":       "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800",
+        "Bozena Shiro":     "https://upload.wikimedia.org/wikipedia/commons/5/5e/Shiro_be_kibbeh.jpg",
+        "Yesiga Alicha":    "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Doro Alicha":      "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Kitfo":            "https://upload.wikimedia.org/wikipedia/commons/c/c9/Kitfo.jpg",
+        "Gored Gored":      "https://upload.wikimedia.org/wikipedia/commons/c/c9/Kitfo.jpg",
+        "Dulet":            "https://upload.wikimedia.org/wikipedia/commons/c/c9/Kitfo.jpg",
+        "Tire Siga":        "https://upload.wikimedia.org/wikipedia/commons/c/c9/Kitfo.jpg",
+        "Kurt":             "https://upload.wikimedia.org/wikipedia/commons/c/c9/Kitfo.jpg",
+        "Tibs":             "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Zilzil Tibs":      "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Derek Tibs":       "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Gomen Besiga":     "https://images.unsplash.com/photo-1576021182211-9ea8dce94d28?w=800",
+        "Ye'abesha Gomen":  "https://images.unsplash.com/photo-1576021182211-9ea8dce94d28?w=800",
+        "Fosolia":          "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=800",
+        "Gomen":            "https://images.unsplash.com/photo-1576021182211-9ea8dce94d28?w=800",
+        "Injera":           "https://upload.wikimedia.org/wikipedia/commons/9/9e/Injera_2.jpg",
+        "Firfir":           "https://upload.wikimedia.org/wikipedia/commons/9/9e/Injera_2.jpg",
+        "Quanta Firfir":    "https://upload.wikimedia.org/wikipedia/commons/9/9e/Injera_2.jpg",
+        "Enqulal Firfir":   "https://images.unsplash.com/photo-1525184782196-8e2e4a1b7de3?w=800",
+        "Kategna":          "https://upload.wikimedia.org/wikipedia/commons/9/9e/Injera_2.jpg",
+        "Chechebsa":        "https://upload.wikimedia.org/wikipedia/commons/9/9e/Injera_2.jpg",
+        "Genfo":            "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=800",
+        "Ful Medames":      "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ful_medames.jpg",
+        "Enqulal Tibs":     "https://images.unsplash.com/photo-1525184782196-8e2e4a1b7de3?w=800",
+        "Kinche":           "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800",
+        "Teff Porridge":    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800",
+        "Beyaynetu":        "https://upload.wikimedia.org/wikipedia/commons/d/d5/Ethiopian_cuisine.jpg",
+        "Yetsom Beyaynetu": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Ethiopian_cuisine.jpg",
+        "Timatim Salad":    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
+        "Buticha":          "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800",
+        "Tegabino":         "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800",
+        "Fassolia":         "https://images.unsplash.com/photo-1551248429-40975aa4de74?w=800",
+        "Dinich Alicha":    "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800",
+        "Tikel Gomen":      "https://images.unsplash.com/photo-1576021182211-9ea8dce94d28?w=800",
+        "Yemisir Kik":      "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Sambusa":          "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800",
+        "Andeguday":        "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800",
+        "Dabo Kolo":        "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800",
+        "Kolo":             "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800",
+        "Fetira":           "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800",
+        "Niter Kibbeh":     "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=800",
+        "Ayib":             "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=800",
+        "Berbere":          "https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=800",
+        "Mitmita":          "https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=800",
+        "Awaze":            "https://images.unsplash.com/photo-1532336414038-cf19250c5757?w=800",
+        "Shorba":           "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Yetsom Shorba":    "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Ambasha":          "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800",
+        "Dabo":             "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800",
+        "Kita":             "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800",
+        "Himbasha":         "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800",
+        "Tej":              "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
+        "Tella":            "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
+        "Buna":             "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800",
+        "Shameta":          "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
+        "Atmet":            "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800",
+        "Tigrayan Zigni":   "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Tihlo":            "https://upload.wikimedia.org/wikipedia/commons/d/d5/Ethiopian_cuisine.jpg",
+        "Shahan Ful":       "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ful_medames.jpg",
+        "Kocho":            "https://upload.wikimedia.org/wikipedia/commons/d/d5/Ethiopian_cuisine.jpg",
+        "Bulla":            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800",
+        "Enqulal be Timatim": "https://images.unsplash.com/photo-1525184782196-8e2e4a1b7de3?w=800",
+        "Yebeg Alicha":     "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Yebeg Wat":        "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Kikil":            "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        "Feseg":            "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Ye'abesha Gomen":  "https://images.unsplash.com/photo-1576021182211-9ea8dce94d28?w=800",
+        "Enjera Firfir be Doro": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Injera_2.jpg",
+        "Ye'dorho Wot be Doro": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Doro_wat.jpg",
+        "Ye'asel Dabo":     "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800",
+        "Gomen Besiga":     "https://images.unsplash.com/photo-1576021182211-9ea8dce94d28?w=800",
+    }
+
+    updated = 0
+    async for dish in dishes.find({}):
+        name = dish.get("name", "")
+        if name in IMAGES:
+            await dishes.update_one(
+                {"_id": dish["_id"]},
+                {"$set": {"reference_image_url": IMAGES[name]}}
+            )
+            updated += 1
+
+    return {"updated": updated, "total_in_map": len(IMAGES)}
