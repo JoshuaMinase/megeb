@@ -218,6 +218,7 @@ header.sticky nav a:hover { color: #FF9124; }
 .box-text { max-width: 600px; text-align: left; }
 
 h1 { color: #263020; font-size: 2cm; font-weight: 100; font-family: 'Times New Roman', serif; }
+.hero-title h1 { color: #fff; }
 .line-box { width: 350px; height: 7px; background: #FF9124; border-radius: 2px; margin-bottom: 20px; }
 .chtext { color: #263020; font-size: 18px; font-family: 'Times New Roman', serif; max-width: 900px; margin: 20px 0 50px; line-height: 1.8; }
 
