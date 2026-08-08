@@ -30,12 +30,12 @@
       "destination": "https://megeb-backend.onrender.com/nutrition/:path*"
     },
     {
-      "source": "/health",
-      "destination": "https://megeb-backend.onrender.com/health"
+      "source": "/uploads/:path*",
+      "destination": "https://megeb-backend.onrender.com/uploads/:path*"
     },
     {
-      "source": "/(.*)",
-      "destination": "/$1"
+      "source": "/health",
+      "destination": "https://megeb-backend.onrender.com/health"
     }
   ]
 }

@@ -134,6 +134,10 @@ app.include_router(upload_router)
 app.include_router(collections_router)
 
 
+@app.get("/")
+def index():
+    return {"status": "ok", "service": "Megeb API"}
+
 @app.get("/api")
 def root():
     return {"status": "Megeb API running"}
@@ -151,9 +155,3 @@ async def health():
 uploads_path = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
-
-# Frontend is served by nginx in production, but can be mounted locally for development
-# On Render, we don't mount the frontend as it's a separate service
-if os.path.exists(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))):
-    frontend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend"))
-    app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
