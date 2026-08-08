@@ -143,47 +143,7 @@
   revealEls.forEach(el => io.observe(el));
 })();
 
-// ===== SMOOTH CURSOR GLOW =====
-(function () {
-  const glow = document.createElement('div');
-  glow.id = 'cursor-glow';
-  document.body.appendChild(glow);
 
-  let mx = -200, my = -200, cx = -200, cy = -200;
-
-  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
-  function loop() {
-    cx += (mx - cx) * 0.1;
-    cy += (my - cy) * 0.1;
-    glow.style.transform = `translate(${cx - 200}px, ${cy - 200}px)`;
-    requestAnimationFrame(loop);
-  }
-  loop();
-})();
-
-// ===== CARD TILT ON HOVER =====
-(function () {
-  document.addEventListener('mousemove', e => {
-    document.querySelectorAll('.recipe-card, .trending-card, .food-card').forEach(card => {
-      const r   = card.getBoundingClientRect();
-      const cx  = r.left + r.width / 2;
-      const cy  = r.top  + r.height / 2;
-      const dx  = (e.clientX - cx) / (r.width / 2);
-      const dy  = (e.clientY - cy) / (r.height / 2);
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 1.4) {
-        card.style.transform = `perspective(600px) rotateY(${dx * 4}deg) rotateX(${-dy * 4}deg) translateY(-6px)`;
-      } else {
-        card.style.transform = '';
-      }
-    });
-  });
-
-  document.addEventListener('mouseleave', () => {
-    document.querySelectorAll('.recipe-card, .trending-card, .food-card').forEach(c => c.style.transform = '');
-  });
-})();
 
 
 // ===== SCROLL-TO-TOP BUTTON =====
