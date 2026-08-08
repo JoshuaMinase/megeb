@@ -156,3 +156,15 @@ uploads_path = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
+
+
+@app.post("/internal/seed-recipes")
+async def seed_recipes_endpoint(secret: str):
+    if secret != "megeb-seed-2024":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    import subprocess, sys
+    result = subprocess.run(
+        [sys.executable, "seed_recipes.py"],
+        capture_output=True, text=True, cwd="/app"
+    )
+    return {"stdout": result.stdout, "stderr": result.stderr, "returncode": result.returncode}
