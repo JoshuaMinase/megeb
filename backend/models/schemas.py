@@ -26,6 +26,7 @@ class RecipeCreate(BaseModel):
     steps: List[RecipeStep]
     nationality: Optional[str] = "Ethiopian"
     image: Optional[str] = ""
+    youtube_url: Optional[str] = ""
     prep_time: Optional[str] = ""
     cook_time: Optional[str] = ""
     servings: Optional[str] = ""
@@ -91,6 +92,7 @@ class VariationCreate(BaseModel):
     ingredients: List[str]
     steps: List[Dict]           # [{"title": ..., "text": ...}]
     image_url: Optional[str] = ""
+    youtube_url: Optional[str] = ""
     prep_time_minutes: Optional[int] = 0
     cook_time_minutes: Optional[int] = 0
     servings: Optional[int] = 2

@@ -14,7 +14,7 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
 
-def dish(name, name_am, category, region, desc, img, phonetic=""):
+def dish(name, name_am, category, region, desc, img, phonetic="", youtube_url=""):
     slug = name.lower().replace(" ", "-").replace("'", "").replace("/", "-").replace("(", "").replace(")", "")
     return {
         "slug": slug,
@@ -25,6 +25,7 @@ def dish(name, name_am, category, region, desc, img, phonetic=""):
         "description": desc,
         "reference_image_url": img,
         "phonetic_name": phonetic,
+        "youtube_url": youtube_url,
         "status": "approved",
         "variation_count": 0,
         "search_count": 0,
@@ -32,7 +33,7 @@ def dish(name, name_am, category, region, desc, img, phonetic=""):
     }
 
 
-def variation(dish_id, var_name, ingredients, steps, tags=None, prep=20, cook=40, servings=4, spice="medium", notes="", story=""):
+def variation(dish_id, var_name, ingredients, steps, tags=None, prep=20, cook=40, servings=4, spice="medium", notes="", story="", youtube_url=""):
     return {
         "dish_id": str(dish_id),
         "variation_name": var_name,
@@ -41,6 +42,7 @@ def variation(dish_id, var_name, ingredients, steps, tags=None, prep=20, cook=40
         "ingredients": ingredients,
         "steps": [{"title": t, "text": x} for t, x in steps],
         "image_url": "",
+        "youtube_url": youtube_url,
         "prep_time_minutes": prep,
         "cook_time_minutes": cook,
         "servings": servings,
@@ -61,52 +63,62 @@ DISHES = [
     dish("Doro Wat", "ዶሮ ወጥ", "main", "All Ethiopia",
          "Ethiopia's national dish — deeply spiced chicken stew simmered with berbere and niter kibbeh, served on injera.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Doro_wat.jpg/1280px-Doro_wat.jpg",
-         "DOH-roh waht"),
+         "DOH-roh waht",
+         "https://www.youtube.com/watch?v=wO_-xP2k9yE"),
 
     dish("Tibs", "ጥብስ", "main", "All Ethiopia",
          "Tender sautéed beef or lamb with jalapeños, rosemary, onions, and tomatoes — one of Ethiopia's most-loved dishes.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Tibs.jpg/1280px-Tibs.jpg",
-         "tibs"),
+         "tibs",
+         "https://www.youtube.com/watch?v=Oi0wr97sZfo"),
 
     dish("Shiro Wat", "ሽሮ ወጥ", "main", "All Ethiopia",
          "Creamy spiced chickpea flour stew — the cornerstone of Ethiopian fasting cuisine.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Shiro_be_kibbeh.jpg/1280px-Shiro_be_kibbeh.jpg",
-         "SHEE-roh waht"),
+         "SHEE-roh waht",
+         "https://www.youtube.com/watch?v=MkNjIz0kZQQ"),
 
     dish("Injera", "እንጀራ", "main", "All Ethiopia",
          "The spongy sourdough teff flatbread that is the foundation of every Ethiopian meal.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Injera_2.jpg/1280px-Injera_2.jpg",
-         "in-JEH-rah"),
+         "in-JEH-rah",
+         "https://www.youtube.com/watch?v=dSJxPGwOqgQ"),
 
     dish("Kitfo", "ክትፎ", "main", "Gurage",
          "Ethiopian steak tartare — minced lean beef seasoned with mitmita and niter kibbeh. A Gurage delicacy.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kitfo.jpg/1280px-Kitfo.jpg",
-         "kit-FOH"),
+         "kit-FOH",
+         "https://www.youtube.com/watch?v=kM6b8x0eZLU"),
 
     dish("Firfir", "ፍርፍር", "main", "All Ethiopia",
          "Torn injera soaked in spiced berbere-tomato sauce. Bold, warming, and quick to prepare.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Firfir.jpg/1280px-Firfir.jpg",
-         "fir-FIR"),
+         "fir-FIR",
+         "https://www.youtube.com/watch?v=qEb40xP_9pE"),
 
     dish("Misir Wat", "ምስር ወጥ", "main", "All Ethiopia",
          "Red lentils slow-cooked in a rich berbere sauce — a staple of Ethiopian fasting days.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Misir_wat.jpg/1280px-Misir_wat.jpg",
-         "mih-SIR waht"),
+         "mih-SIR waht",
+         "https://www.youtube.com/watch?v=2i82HNm_tQI"),
 
     dish("Beyaynetu", "በያይነቱ", "main", "All Ethiopia",
          "The grand Ethiopian vegetarian platter — a colourful spread of fasting dishes served on injera.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg",
-         "beh-yay-NEH-too"),
+         "beh-yay-NEH-too",
+         "https://www.youtube.com/watch?v=PdPlxNZVDcg"),
 
     dish("Gomen", "ጎመን", "main", "All Ethiopia",
          "Ethiopian collard greens sautéed with garlic, onion, and mild spices. A classic fasting side.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Gomen.jpg/1280px-Gomen.jpg",
-         "GOH-men"),
+         "GOH-men",
+         "https://www.youtube.com/watch?v=VqzDqJhN0fc"),
 
     dish("Atkilt Wat", "አትክልት ወጥ", "main", "All Ethiopia",
          "Spiced cabbage, carrot, and potato stew — mild, comforting, and fully vegan.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Atkilt_wat.jpg/1280px-Atkilt_wat.jpg",
-         "at-KILT waht"),
+         "at-KILT waht",
+         "https://www.youtube.com/watch?v=kqJxBLBWLkc"),
 ]
 
 
@@ -114,79 +126,94 @@ DISHES += [
     dish("Sambusa", "ሳምቡሳ", "snack", "All Ethiopia",
          "Crispy fried pastry triangles stuffed with spiced lentils or beef. A popular Ethiopian street food.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Samosa_with_dipping_sauce.jpg/1280px-Samosa_with_dipping_sauce.jpg",
-         "sam-BOO-sah"),
+         "sam-BOO-sah",
+         "https://www.youtube.com/watch?v=92q5qxiNhAA"),
 
     dish("Chechebsa", "ጨጨብሳ", "breakfast", "Oromia",
          "Shredded flatbread tossed with niter kibbeh and berbere — a beloved Ethiopian breakfast.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Chechebsa.jpg/1280px-Chechebsa.jpg",
-         "cheh-cheb-SAH"),
+         "cheh-cheb-SAH",
+         "https://www.youtube.com/watch?v=PZRc6RkMWZo"),
 
     dish("Genfo", "ገንፎ", "breakfast", "All Ethiopia",
          "Thick teff porridge served with a well of niter kibbeh and berbere at the centre.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Genfo.jpg/1280px-Genfo.jpg",
-         "GEN-foh"),
+         "GEN-foh",
+         "https://www.youtube.com/watch?v=GhXXlW9XfQo"),
 
     dish("Kik Alicha", "ቂቅ አልጫ", "main", "All Ethiopia",
          "Yellow split peas cooked with turmeric and garlic — mild, golden, and comforting.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Kik_alicha.jpg/1280px-Kik_alicha.jpg",
-         "kik ah-LEE-chah"),
+         "kik ah-LEE-chah",
+         "https://www.youtube.com/watch?v=T3YqYIIKFo0"),
 
     dish("Siga Wat", "ስጋ ወጥ", "main", "All Ethiopia",
          "Beef chunks slow-cooked in a fiery berbere stew with niter kibbeh.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Siga_wat.jpg/1280px-Siga_wat.jpg",
-         "SIH-gah waht"),
+         "SIH-gah waht",
+         "https://www.youtube.com/watch?v=jhJSzaqgNhE"),
 
     dish("Alicha Wat", "አልጫ ወጥ", "main", "All Ethiopia",
          "Mild chicken or lamb stew with turmeric, ginger, and garlic — no berbere, gentle on spice.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg",
-         "ah-LEE-chah waht"),
+         "ah-LEE-chah waht",
+         "https://www.youtube.com/watch?v=vTx7xV2wAXE"),
 
     dish("Fosolia", "ፎሶሊያ", "main", "All Ethiopia",
          "Ethiopian green beans and carrots sautéed with garlic and ginger.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Green_beans.jpg/1280px-Green_beans.jpg",
-         "foh-SOH-lee-ah"),
+         "foh-SOH-lee-ah",
+         "https://www.youtube.com/watch?v=NfNvQKl5kro"),
 
     dish("Timatim Salad", "ቲማቲም ሰላጣ", "salad", "All Ethiopia",
          "Fresh Ethiopian tomato and jalapeño salad dressed with lemon juice and olive oil.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Timatim_salad.jpg/1280px-Timatim_salad.jpg",
-         "tee-mah-TEEM"),
+         "tee-mah-TEEM",
+         "https://www.youtube.com/watch?v=R89XAoLT1Eo"),
 
     dish("Ful Medames", "ፉል", "breakfast", "All Ethiopia",
          "Mashed fava beans with lemon, garlic, and chilli — a popular Ethiopian breakfast.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Ful_medames.jpg/1280px-Ful_medames.jpg",
-         "fool meh-DAH-mes"),
+         "fool meh-DAH-mes",
+         "https://www.youtube.com/watch?v=sxhHQp0r-IE"),
 
     dish("Buticha", "ቡጢቻ", "snack", "All Ethiopia",
          "Smooth chickpea dip seasoned with lemon, garlic, and jalapeño — served cold with injera.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Hummus_from_The_Nile.jpg/1280px-Hummus_from_The_Nile.jpg",
-         "boo-TEE-chah"),
+         "boo-TEE-chah",
+         "https://www.youtube.com/watch?v=N9a3JlSfh5s"),
 ]
 
 DISHES += [
     dish("Dulet", "ዱለት", "main", "All Ethiopia",
          "Minced tripe, liver, and beef sautéed with mitmita and jalapeño — a bold Ethiopian offal dish.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg",
-         "doo-LET"),
+         "doo-LET",
+         "https://www.youtube.com/watch?v=BvY8BLbHKBk"),
 
     dish("Quanta Firfir", "ቋንጣ ፍርፍር", "main", "All Ethiopia",
          "Dried beef strips rehydrated and mixed with injera in a spiced berbere sauce.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Firfir.jpg/1280px-Firfir.jpg",
-         "KWAN-tah fir-FIR"),
+         "KWAN-tah fir-FIR",
+         "https://www.youtube.com/watch?v=GqY4yxNkRvM"),
 
     dish("Niter Kibbeh", "ንጥር ቅቤ", "condiment", "All Ethiopia",
          "Ethiopian spiced clarified butter infused with onion, garlic, ginger, and warming spices.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Niter_kibbeh.jpg/1280px-Niter_kibbeh.jpg",
-         "NIH-ter kib-BEH"),
+         "NIH-ter kib-BEH",
+         "https://www.youtube.com/watch?v=K-x7IVT61vI"),
 
     dish("Ayib", "አይብ", "condiment", "All Ethiopia",
          "Ethiopian fresh cottage cheese — mild and crumbly, served alongside spicy stews.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Ayib.jpg/1280px-Ayib.jpg",
-         "AH-yib"),
+         "AH-yib",
+         "https://www.youtube.com/watch?v=Ij9h1ZRH5Rk"),
 
     dish("Tegabino", "ተጋቢኖ", "snack", "All Ethiopia",
          "Roasted chickpea flour porridge cooked with spiced butter — a popular Ethiopian street food.",
          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg",
-         "teh-gah-BEE-noh"),
+         "teh-gah-BEE-noh",
+         "https://www.youtube.com/watch?v=x4vKwCJ0lq0"),
 ]
 
 
@@ -205,7 +232,8 @@ VARIATIONS = {
          ("Add eggs", "Add pierced hard-boiled eggs, simmer 20 min until thick."),
          ("Serve", "Serve hot over fresh injera.")],
         spice="hot", prep=30, cook=90,
-        story="Served at almost every Ethiopian celebration. The dry-cooked onions are the secret to its deep flavour."),
+        story="Served at almost every Ethiopian celebration. The dry-cooked onions are the secret to its deep flavour.",
+        youtube_url="https://www.youtube.com/watch?v=wO_-xP2k9yE"),
 
     "Tibs": lambda did: variation(did, "Classic Tibs",
         ["500g beef or lamb, cubed", "2 onions, sliced", "2 jalapeños",
@@ -214,7 +242,8 @@ VARIATIONS = {
          ("Sear meat", "Sear meat without stirring for 3–4 min."),
          ("Add aromatics", "Add onions, jalapeños, rosemary. Toss 5 min."),
          ("Finish", "Add tomatoes, cook 5 min. Season and serve.")],
-        spice="medium", prep=15, cook=20),
+        spice="medium", prep=15, cook=20,
+        youtube_url="https://www.youtube.com/watch?v=Oi0wr97sZfo"),
 
     "Shiro Wat": lambda did: variation(did, "Classic Shiro Wat",
         ["1 cup shiro powder", "2 onions, finely chopped", "3 cups water",
@@ -224,7 +253,8 @@ VARIATIONS = {
          ("Add water", "Pour in water, bring to gentle boil."),
          ("Whisk shiro", "Slowly whisk in shiro powder to avoid lumps."),
          ("Simmer", "Simmer 10–15 min stirring until thick. Season.")],
-        tags=["vegan", "fasting_friendly"], spice="medium", prep=10, cook=25),
+        tags=["vegan", "fasting_friendly"], spice="medium", prep=10, cook=25,
+        youtube_url="https://www.youtube.com/watch?v=MkNjIz0kZQQ"),
 
     "Injera": lambda did: variation(did, "Classic Teff Injera",
         ["3 cups teff flour", "3 cups water", "1/2 tsp salt"],
@@ -234,7 +264,8 @@ VARIATIONS = {
          ("Cool", "Slide onto rack. Cool before stacking.")],
         tags=["vegan", "fasting_friendly", "dairy_free", "gluten_free"],
         spice="mild", prep=5, cook=30,
-        notes="True teff injera is naturally gluten-free. Longer ferment = more sour flavour."),
+        notes="True teff injera is naturally gluten-free. Longer ferment = more sour flavour.",
+        youtube_url="https://www.youtube.com/watch?v=dSJxPGwOqgQ"),
 
     "Kitfo": lambda did: variation(did, "Classic Kitfo",
         ["400g very lean beef, minced", "2 tbsp niter kibbeh", "1 tsp mitmita",
@@ -243,7 +274,8 @@ VARIATIONS = {
          ("Mix beef", "Toss minced beef with spiced butter until fully coated."),
          ("Serve", "Serve immediately with ayib and injera.")],
         tags=["gluten_free"], spice="hot", prep=20, cook=5,
-        story="A Gurage delicacy served at weddings. Fresh beef and quality niter kibbeh make all the difference."),
+        story="A Gurage delicacy served at weddings. Fresh beef and quality niter kibbeh make all the difference.",
+        youtube_url="https://www.youtube.com/watch?v=kM6b8x0eZLU"),
 
     "Firfir": lambda did: variation(did, "Classic Firfir",
         ["2 large onions", "1/4 cup oil", "2 tbsp berbere", "1 tbsp garlic paste",
@@ -252,7 +284,8 @@ VARIATIONS = {
          ("Add spices", "Add garlic and berbere, cook 5 min."),
          ("Simmer sauce", "Add tomatoes and water, simmer 10 min."),
          ("Mix injera", "Fold in torn injera, coat each piece. Serve warm.")],
-        tags=["vegan", "fasting_friendly"], spice="hot", prep=10, cook=25),
+        tags=["vegan", "fasting_friendly"], spice="hot", prep=10, cook=25,
+        youtube_url="https://www.youtube.com/watch?v=qEb40xP_9pE"),
 
     "Misir Wat": lambda did: variation(did, "Classic Misir Wat",
         ["2 cups red lentils", "3 onions, finely chopped", "3 tbsp berbere",
@@ -261,14 +294,16 @@ VARIATIONS = {
          ("Add spices", "Add berbere, garlic, ginger. Cook 5 min."),
          ("Add lentils", "Add rinsed lentils and water. Bring to boil."),
          ("Simmer", "Simmer 25 min stirring until thick and creamy.")],
-        tags=["vegan", "fasting_friendly", "gluten_free"], spice="hot", prep=10, cook=40),
+        tags=["vegan", "fasting_friendly", "gluten_free"], spice="hot", prep=10, cook=40,
+        youtube_url="https://www.youtube.com/watch?v=2i82HNm_tQI"),
 
     "Beyaynetu": lambda did: variation(did, "Classic Beyaynetu",
         ["Misir wat", "Shiro wat", "Gomen", "Atkilt wat", "Timatim salad", "Fosolia", "Injera"],
         [("Prepare each dish", "Cook misir, shiro, gomen, atkilt, and fosolia separately."),
          ("Arrange", "Line a large injera on a tray. Spoon each dish in separate mounds."),
          ("Serve", "Tear injera pieces and scoop stews. Eat communally.")],
-        tags=["vegan", "fasting_friendly"], spice="medium", prep=30, cook=60),
+        tags=["vegan", "fasting_friendly"], spice="medium", prep=30, cook=60,
+        youtube_url="https://www.youtube.com/watch?v=PdPlxNZVDcg"),
 
     "Gomen": lambda did: variation(did, "Classic Gomen",
         ["1 large bunch collard greens, chopped", "2 onions, sliced", "4 garlic cloves",
@@ -276,7 +311,8 @@ VARIATIONS = {
         [("Blanch greens", "Boil collards 5 min, drain and squeeze dry."),
          ("Sauté aromatics", "Heat oil, cook onions 8 min. Add garlic and ginger."),
          ("Combine", "Add greens and jalapeño, toss, cook 10 min. Season.")],
-        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=15, cook=25),
+        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=15, cook=25,
+        youtube_url="https://www.youtube.com/watch?v=VqzDqJhN0fc"),
 
     "Atkilt Wat": lambda did: variation(did, "Classic Atkilt Wat",
         ["1/2 head cabbage, chopped", "3 carrots, sliced", "3 potatoes, cubed",
@@ -285,7 +321,8 @@ VARIATIONS = {
          ("Add spices", "Add turmeric and cumin, cook 2 min."),
          ("Add veg", "Add potatoes and carrots 10 min. Add cabbage."),
          ("Finish", "Cover and cook 15 min until tender.")],
-        tags=["vegan", "fasting_friendly", "gluten_free", "dairy_free"], spice="mild", prep=15, cook=30),
+        tags=["vegan", "fasting_friendly", "gluten_free", "dairy_free"], spice="mild", prep=15, cook=30,
+        youtube_url="https://www.youtube.com/watch?v=kqJxBLBWLkc"),
 
     "Sambusa": lambda did: variation(did, "Lentil Sambusa",
         ["2 cups flour", "Water and salt for dough", "1 cup cooked lentils",
@@ -294,7 +331,8 @@ VARIATIONS = {
          ("Make filling", "Cook onion, jalapeño, cumin with lentils. Cool."),
          ("Shape", "Roll dough thin, fold into cones, fill, seal."),
          ("Fry", "Deep-fry in hot oil until golden, 3–4 min.")],
-        tags=["vegan", "fasting_friendly"], spice="medium", prep=30, cook=20),
+        tags=["vegan", "fasting_friendly"], spice="medium", prep=30, cook=20,
+        youtube_url="https://www.youtube.com/watch?v=92q5qxiNhAA"),
 
     "Chechebsa": lambda did: variation(did, "Classic Chechebsa",
         ["2 kita flatbreads", "3 tbsp niter kibbeh", "1 tbsp berbere", "Honey to serve"],
@@ -302,14 +340,16 @@ VARIATIONS = {
          ("Shred", "Tear into bite-size pieces."),
          ("Toss", "Toss warm pieces with niter kibbeh and berbere."),
          ("Serve", "Drizzle with honey. Serve for breakfast.")],
-        spice="medium", prep=10, cook=15),
+        spice="medium", prep=10, cook=15,
+        youtube_url="https://www.youtube.com/watch?v=PZRc6RkMWZo"),
 
     "Genfo": lambda did: variation(did, "Classic Genfo",
         ["1 cup teff flour", "3 cups water", "1/2 tsp salt", "2 tbsp niter kibbeh", "1 tsp berbere"],
         [("Boil water", "Bring salted water to boil."),
          ("Whisk teff", "Slowly whisk in teff flour. Stir constantly 15 min until very thick."),
          ("Serve", "Mound in bowl, make a well, fill with niter kibbeh and berbere.")],
-        tags=["gluten_free"], spice="medium", prep=5, cook=20),
+        tags=["gluten_free"], spice="medium", prep=5, cook=20,
+        youtube_url="https://www.youtube.com/watch?v=GhXXlW9XfQo"),
 
     "Kik Alicha": lambda did: variation(did, "Classic Kik Alicha",
         ["2 cups yellow split peas", "3 cups water", "2 onions",
@@ -317,7 +357,8 @@ VARIATIONS = {
         [("Cook peas", "Boil split peas in water 20 min until soft."),
          ("Sauté", "Cook onions in oil 8 min, add turmeric and garlic."),
          ("Combine", "Add peas to onion mix, simmer 10 min. Mash slightly.")],
-        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=10, cook=35),
+        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=10, cook=35,
+        youtube_url="https://www.youtube.com/watch?v=T3YqYIIKFo0"),
 
     "Siga Wat": lambda did: variation(did, "Classic Siga Wat",
         ["700g beef, cubed", "4 onions", "3 tbsp berbere", "3 tbsp niter kibbeh",
@@ -325,7 +366,8 @@ VARIATIONS = {
         [("Cook onions", "Dry-cook onions 15 min, add niter kibbeh, cook 10 min."),
          ("Add berbere", "Add berbere, garlic, ginger. Cook 8 min."),
          ("Braise", "Add beef, add 1/2 cup water. Simmer 45 min until tender.")],
-        spice="hot", prep=15, cook=75),
+        spice="hot", prep=15, cook=75,
+        youtube_url="https://www.youtube.com/watch?v=jhJSzaqgNhE"),
 
     "Alicha Wat": lambda did: variation(did, "Classic Alicha Wat",
         ["1kg chicken or lamb pieces", "3 onions", "1 tsp turmeric",
@@ -333,21 +375,24 @@ VARIATIONS = {
         [("Cook onions", "Cook onions in niter kibbeh 12 min."),
          ("Add spices", "Add turmeric, ginger, garlic. Cook 3 min."),
          ("Add meat", "Add meat, cook 35 min until tender.")],
-        spice="mild", prep=15, cook=50),
+        spice="mild", prep=15, cook=50,
+        youtube_url="https://www.youtube.com/watch?v=vTx7xV2wAXE"),
 
     "Fosolia": lambda did: variation(did, "Classic Fosolia",
         ["300g green beans", "2 carrots, julienned", "2 onions",
          "3 garlic cloves", "2 tbsp oil", "Salt"],
         [("Sauté", "Heat oil, cook onions 5 min, add garlic."),
          ("Add veg", "Add beans and carrots, cook 12 min until tender. Season.")],
-        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=10, cook=20),
+        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=10, cook=20,
+        youtube_url="https://www.youtube.com/watch?v=NfNvQKl5kro"),
 
     "Timatim Salad": lambda did: variation(did, "Classic Timatim Salad",
         ["4 tomatoes, diced", "1 red onion, diced", "2 jalapeños, sliced",
          "Juice of 1 lemon", "2 tbsp olive oil", "Salt"],
         [("Mix", "Combine all ingredients."),
          ("Rest", "Let sit 10 min before serving.")],
-        tags=["vegan", "fasting_friendly", "gluten_free", "dairy_free"], spice="mild", prep=10, cook=0),
+        tags=["vegan", "fasting_friendly", "gluten_free", "dairy_free"], spice="mild", prep=10, cook=0,
+        youtube_url="https://www.youtube.com/watch?v=R89XAoLT1Eo"),
 
     "Ful Medames": lambda did: variation(did, "Classic Ful Medames",
         ["2 cups cooked fava beans", "Juice of 1 lemon", "2 garlic cloves, minced",
@@ -355,14 +400,16 @@ VARIATIONS = {
         [("Mash", "Roughly mash fava beans with a fork."),
          ("Season", "Add lemon, garlic, jalapeño, oil, salt. Mix well."),
          ("Serve", "Serve warm with injera or bread.")],
-        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=5, cook=15),
+        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=5, cook=15,
+        youtube_url="https://www.youtube.com/watch?v=sxhHQp0r-IE"),
 
     "Buticha": lambda did: variation(did, "Classic Buticha",
         ["2 cups cooked chickpeas", "2 tbsp olive oil", "Juice of 1 lemon",
          "2 garlic cloves", "1 jalapeño", "Salt"],
         [("Blend", "Blend all ingredients until smooth."),
          ("Serve", "Drizzle with oil, serve chilled with injera.")],
-        tags=["vegan", "fasting_friendly", "gluten_free", "dairy_free"], spice="mild", prep=10, cook=0),
+        tags=["vegan", "fasting_friendly", "gluten_free"], spice="mild", prep=10, cook=0,
+        youtube_url="https://www.youtube.com/watch?v=N9a3JlSfh5s"),
 
     "Niter Kibbeh": lambda did: variation(did, "Classic Niter Kibbeh",
         ["500g unsalted butter", "1 onion, chopped", "4 garlic cloves",
@@ -370,14 +417,16 @@ VARIATIONS = {
         [("Melt butter", "Melt butter over low heat."),
          ("Add aromatics", "Add all aromatics, simmer 20 min — do not boil."),
          ("Strain", "Pour through fine sieve into jar. Keeps 3 months refrigerated.")],
-        tags=["gluten_free"], spice="mild", prep=5, cook=30, servings=16),
+        tags=["gluten_free"], spice="mild", prep=5, cook=30, servings=16,
+        youtube_url="https://www.youtube.com/watch?v=K-x7IVT61vI"),
 
     "Ayib": lambda did: variation(did, "Classic Ayib",
         ["2 litres whole milk", "3 tbsp lemon juice", "1/2 tsp salt"],
         [("Heat milk", "Bring milk to near boil."),
          ("Curdle", "Add lemon juice, stir gently. Curds will form."),
          ("Drain", "Pour through cheesecloth, drain 1 hour. Salt and serve.")],
-        tags=["gluten_free"], spice="mild", prep=5, cook=20, servings=6),
+        tags=["gluten_free"], spice="mild", prep=5, cook=20, servings=6,
+        youtube_url="https://www.youtube.com/watch?v=Ij9h1ZRH5Rk"),
 
     "Dulet": lambda did: variation(did, "Classic Dulet",
         ["200g tripe, minced", "200g liver, minced", "200g lean beef, minced",
@@ -385,7 +434,8 @@ VARIATIONS = {
         [("Cook onions", "Sauté onions in niter kibbeh 8 min."),
          ("Add meats", "Add tripe first (5 min), then beef (3 min), then liver (2 min)."),
          ("Season", "Add mitmita, jalapeño, salt. Toss and serve with injera.")],
-        spice="hot", prep=20, cook=20, servings=3),
+        spice="hot", prep=20, cook=20, servings=3,
+        youtube_url="https://www.youtube.com/watch?v=BvY8BLbHKBk"),
 
     "Quanta Firfir": lambda did: variation(did, "Classic Quanta Firfir",
         ["200g quanta (dried beef), soaked", "2 onions", "2 tbsp berbere",
@@ -393,14 +443,16 @@ VARIATIONS = {
         [("Cook onions", "Sauté onions in niter kibbeh 10 min."),
          ("Add beef", "Add quanta and berbere, cook 10 min."),
          ("Add injera", "Fold in torn injera, coat well. Serve hot.")],
-        spice="hot", prep=15, cook=25, servings=3),
+        spice="hot", prep=15, cook=25, servings=3,
+        youtube_url="https://www.youtube.com/watch?v=GqY4yxNkRvM"),
 
     "Tegabino": lambda did: variation(did, "Classic Tegabino",
         ["1 cup roasted chickpea flour", "2 cups water", "2 tbsp niter kibbeh", "Salt", "Berbere to taste"],
         [("Toast flour", "Dry-toast chickpea flour in pan 3 min until fragrant."),
          ("Add water", "Add water gradually, whisk to avoid lumps."),
          ("Cook", "Stir over medium heat 10 min until thick. Add niter kibbeh.")],
-        tags=["fasting_friendly"], spice="medium", prep=5, cook=15, servings=2),
+        tags=["fasting_friendly"], spice="medium", prep=5, cook=15, servings=2,
+        youtube_url="https://www.youtube.com/watch?v=x4vKwCJ0lq0"),
 }
 
 
@@ -418,7 +470,7 @@ async def seed():
         await variations_col.drop()
 
     result = await dishes_col.insert_many(DISHES)
-    print(f"✅ Seeded {len(result.inserted_ids)} dishes.")
+    print(f"Seeded {len(result.inserted_ids)} dishes.")
 
     # Build name → _id map
     id_map = {}
@@ -433,7 +485,7 @@ async def seed():
 
     if var_docs:
         vr = await variations_col.insert_many(var_docs)
-        print(f"✅ Seeded {len(vr.inserted_ids)} variations.")
+        print(f"Seeded {len(vr.inserted_ids)} variations.")
 
         # Set variation_count = 1 on each dish that has a variation
         for dish_name in VARIATIONS:
@@ -443,8 +495,7 @@ async def seed():
                     {"$set": {"variation_count": 1}}
                 )
 
-    print("🎉 Done! Your Megeb database is ready.")
-    await client.close()
+    print("Done! Your Megeb database is ready.")
 
 
 asyncio.run(seed())
