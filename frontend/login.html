@@ -79,15 +79,21 @@
       btn.disabled = true;
       btn.textContent = 'Logging in...';
 
+      const slowTimer = setTimeout(() => {
+        btn.textContent = 'Waking up server… please wait (30s)';
+      }, 4000);
+
       try {
         await login(
           document.getElementById('email').value.trim(),
           document.getElementById('password').value
         );
+        clearTimeout(slowTimer);
         const redirect = new URLSearchParams(window.location.search).get('next') || 'foods.html';
         window.location.href = redirect;
       } catch (err) {
-        errEl.textContent = err.message;
+        clearTimeout(slowTimer);
+        errEl.textContent = err.message || 'Could not connect. The server may be waking up — please try again in 30 seconds.';
         errEl.classList.add('show');
         btn.disabled = false;
         btn.textContent = 'Log In';

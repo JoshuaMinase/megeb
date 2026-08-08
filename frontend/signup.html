@@ -91,6 +91,11 @@
       btn.disabled = true;
       btn.textContent = 'Creating account...';
 
+      // Show a "waking up" message if the server is slow (free tier cold start)
+      const slowTimer = setTimeout(() => {
+        btn.textContent = 'Waking up server… please wait (30s)';
+      }, 4000);
+
       try {
         await signup(
           document.getElementById('name').value.trim(),
@@ -98,9 +103,11 @@
           document.getElementById('password').value,
           'Ethiopian'
         );
+        clearTimeout(slowTimer);
         window.location.href = 'foods.html';
       } catch (err) {
-        showError(err.message);
+        clearTimeout(slowTimer);
+        showError(err.message || 'Could not connect. The server may be waking up — please try again in 30 seconds.');
         btn.disabled = false;
         btn.textContent = 'Create Account';
       }

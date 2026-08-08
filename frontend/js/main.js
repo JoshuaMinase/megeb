@@ -1,3 +1,9 @@
+// ===== SERVER WARM-UP PING =====
+// Render free tier sleeps after inactivity — ping on page load to wake it up
+(function () {
+  fetch('/health').catch(() => {});
+})();
+
 // ===== STICKY HEADER =====
 (function () {
   const header = document.querySelector('header');
