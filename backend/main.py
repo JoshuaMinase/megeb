@@ -183,108 +183,108 @@ async def seed_dishes_endpoint(secret: str):
     DISH_DATA = [
         # ── Wat / Stews ──
         dk("Doro Wat","ዶሮ ወጥ","main","All Ethiopia","Ethiopia's national dish — deeply spiced chicken stew with berbere and niter kibbeh, served on injera.","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Doro_wat.jpg/1280px-Doro_wat.jpg","DOH-roh waht"),
-        dk("Siga Wat","ስጋ ወጥ","main","All Ethiopia","Beef chunks slow-cooked in fiery berbere stew with niter kibbeh.",IMG,"SIH-gah waht"),
-        dk("Misir Wat","ምስር ወጥ","main","All Ethiopia","Red lentils slow-cooked in rich berbere sauce — a fasting staple.",IMG,"mih-SIR waht"),
+        dk("Siga Wat","ስጋ ወጥ","main","All Ethiopia","Beef chunks slow-cooked in fiery berbere stew with niter kibbeh.","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Doro_wat.jpg/1280px-Doro_wat.jpg","SIH-gah waht"),
+        dk("Misir Wat","ምስር ወጥ","main","All Ethiopia","Red lentils slow-cooked in rich berbere sauce — a fasting staple.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Lentil_stew.jpg/1280px-Lentil_stew.jpg","mih-SIR waht"),
         dk("Shiro Wat","ሽሮ ወጥ","main","All Ethiopia","Creamy spiced chickpea flour stew — cornerstone of Ethiopian fasting cuisine.","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Shiro_be_kibbeh.jpg/1280px-Shiro_be_kibbeh.jpg","SHEE-roh waht"),
-        dk("Alicha Wat","አልጫ ወጥ","main","All Ethiopia","Mild chicken or lamb stew with turmeric and ginger — no berbere, gentle on spice.",IMG,"ah-LEE-chah waht"),
-        dk("Kik Alicha","ቂቅ አልጫ","main","All Ethiopia","Yellow split peas with turmeric and garlic — mild, golden, comforting.",IMG,"kik ah-LEE-chah"),
-        dk("Atkilt Wat","አትክልት ወጥ","main","All Ethiopia","Spiced cabbage, carrot, and potato stew — mild and vegan.",IMG,"at-KILT waht"),
-        dk("Bozena Shiro","ቦዘና ሽሮ","main","All Ethiopia","Shiro wat elevated with chunks of beef or lamb stirred in at the end.",IMG,"boh-ZEH-nah SHEE-roh"),
-        dk("Yesiga Alicha","የስጋ አልጫ","main","All Ethiopia","Mild beef stew cooked with turmeric, ginger, and onions — no spice.",IMG,"yeh-SIH-gah ah-LEE-chah"),
-        dk("Doro Alicha","ዶሮ አልጫ","main","All Ethiopia","Mild chicken stew with turmeric and niter kibbeh — the gentle cousin of Doro Wat.",IMG,"DOH-roh ah-LEE-chah"),
+        dk("Alicha Wat","አልጫ ወጥ","main","All Ethiopia","Mild chicken or lamb stew with turmeric and ginger — no berbere, gentle on spice.","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Doro_wat.jpg/1280px-Doro_wat.jpg","ah-LEE-chah waht"),
+        dk("Kik Alicha","ቂቅ አልጫ","main","All Ethiopia","Yellow split peas with turmeric and garlic — mild, golden, comforting.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Yellow_split_pea_soup.jpg/1280px-Yellow_split_pea_soup.jpg","kik ah-LEE-chah"),
+        dk("Atkilt Wat","አትክልት ወጥ","main","All Ethiopia","Spiced cabbage, carrot, and potato stew — mild and vegan.","https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Stir_fried_cabbage.jpg/1280px-Stir_fried_cabbage.jpg","at-KILT waht"),
+        dk("Bozena Shiro","ቦዘና ሽሮ","main","All Ethiopia","Shiro wat elevated with chunks of beef or lamb stirred in at the end.","https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Shiro_be_kibbeh.jpg/1280px-Shiro_be_kibbeh.jpg","boh-ZEH-nah SHEE-roh"),
+        dk("Yesiga Alicha","የስጋ አልጫ","main","All Ethiopia","Mild beef stew cooked with turmeric, ginger, and onions — no spice.","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Doro_wat.jpg/1280px-Doro_wat.jpg","yeh-SIH-gah ah-LEE-chah"),
+        dk("Doro Alicha","ዶሮ አልጫ","main","All Ethiopia","Mild chicken stew with turmeric and niter kibbeh — the gentle cousin of Doro Wat.","https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Doro_wat.jpg/1280px-Doro_wat.jpg","DOH-roh ah-LEE-chah"),
         # ── Raw / Tartare ──
         dk("Kitfo","ክትፎ","main","Gurage","Ethiopian steak tartare — minced lean beef with mitmita and niter kibbeh.","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kitfo.jpg/1280px-Kitfo.jpg","kit-FOH"),
-        dk("Gored Gored","ጎረድ ጎረድ","main","Addis Ababa","Cubed raw beef tossed with mitmita, awaze, and niter kibbeh — served rare.",IMG,"GOH-red GOH-red"),
-        dk("Dulet","ዱለት","main","All Ethiopia","Minced tripe, liver, and beef sautéed with mitmita and jalapeño.",IMG,"doo-LET"),
+        dk("Gored Gored","ጎረድ ጎረድ","main","Addis Ababa","Cubed raw beef tossed with mitmita, awaze, and niter kibbeh — served rare.","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kitfo.jpg/1280px-Kitfo.jpg","GOH-red GOH-red"),
+        dk("Dulet","ዱለት","main","All Ethiopia","Minced tripe, liver, and beef sautéed with mitmita and jalapeño.","https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kitfo.jpg/1280px-Kitfo.jpg","doo-LET"),
         # ── Sautéed / Grilled ──
         dk("Tibs","ጥብስ","main","All Ethiopia","Tender sautéed beef or lamb with jalapeños, rosemary, onions, and tomatoes.","https://live.staticflickr.com/4092/5002959689_d1a6e6d8e0_b.jpg","tibs"),
-        dk("Zilzil Tibs","ዝልዝል ጥብስ","main","All Ethiopia","Strips of beef marinated and sautéed with awaze and rosemary.",IMG,"ZIL-zil tibs"),
-        dk("Derek Tibs","ደረቅ ጥብስ","main","All Ethiopia","Dry-fried crispy beef or lamb tibs — cooked until the edges are crunchy.",IMG,"DEH-rek tibs"),
-        dk("Gomen Besiga","ጎመን በስጋ","main","All Ethiopia","Collard greens cooked with tender chunks of beef.",IMG,"GOH-men beh-SIH-gah"),
-        dk("Ye'abesha Gomen","የአበሻ ጎመን","main","All Ethiopia","Collard greens braised with onion and spiced butter — a classic side.",IMG,"yeh-ah-BEH-shah GOH-men"),
-        dk("Fosolia","ፎሶሊያ","main","All Ethiopia","Ethiopian green beans and carrots sautéed with garlic.",IMG,"foh-SOH-lee-ah"),
-        dk("Gomen","ጎመን","main","All Ethiopia","Ethiopian collard greens sautéed with garlic, onion, and mild spices.",IMG,"GOH-men"),
+        dk("Zilzil Tibs","ዝልዝል ጥብስ","main","All Ethiopia","Strips of beef marinated and sautéed with awaze and rosemary.","https://live.staticflickr.com/4092/5002959689_d1a6e6d8e0_b.jpg","ZIL-zil tibs"),
+        dk("Derek Tibs","ደረቅ ጥብስ","main","All Ethiopia","Dry-fried crispy beef or lamb tibs — cooked until the edges are crunchy.","https://live.staticflickr.com/4092/5002959689_d1a6e6d8e0_b.jpg","DEH-rek tibs"),
+        dk("Gomen Besiga","ጎመን በስጋ","main","All Ethiopia","Collard greens cooked with tender chunks of beef.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Gomen.jpg/1280px-Gomen.jpg","GOH-men beh-SIH-gah"),
+        dk("Ye'abesha Gomen","የአበሻ ጎመን","main","All Ethiopia","Collard greens braised with onion and spiced butter — a classic side.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Gomen.jpg/1280px-Gomen.jpg","yeh-ah-BEH-shah GOH-men"),
+        dk("Fosolia","ፎሶሊያ","main","All Ethiopia","Ethiopian green beans and carrots sautéed with garlic.","https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Green_beans.jpg/1280px-Green_beans.jpg","foh-SOH-lee-ah"),
+        dk("Gomen","ጎመን","main","All Ethiopia","Ethiopian collard greens sautéed with garlic, onion, and mild spices.","https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Gomen.jpg/1280px-Gomen.jpg","GOH-men"),
     ]
 
 
     DISH_DATA += [
         # ── Injera & Firfir ──
         dk("Injera","እንጀራ","main","All Ethiopia","The spongy sourdough teff flatbread — foundation of every Ethiopian meal.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Injera_2.jpg/1280px-Injera_2.jpg","in-JEH-rah"),
-        dk("Firfir","ፍርፍር","main","All Ethiopia","Torn injera soaked in spiced berbere-tomato sauce — bold and warming.",IMG,"fir-FIR"),
-        dk("Quanta Firfir","ቋንጣ ፍርፍር","main","All Ethiopia","Dried beef strips rehydrated and mixed with injera in berbere sauce.",IMG,"KWAN-tah fir-FIR"),
-        dk("Enqulal Firfir","እንቁላል ፍርፍር","breakfast","All Ethiopia","Scrambled eggs mixed with torn injera, tomatoes, and jalapeños.",IMG,"en-koo-LAL fir-FIR"),
-        dk("Kategna","ካተኛ","snack","All Ethiopia","Toasted injera brushed with berbere and niter kibbeh — a beloved snack.",IMG,"kah-TEG-nah"),
+        dk("Firfir","ፍርፍር","main","All Ethiopia","Torn injera soaked in spiced berbere-tomato sauce — bold and warming.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Injera_2.jpg/1280px-Injera_2.jpg","fir-FIR"),
+        dk("Quanta Firfir","ቋንጣ ፍርፍር","main","All Ethiopia","Dried beef strips rehydrated and mixed with injera in berbere sauce.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Injera_2.jpg/1280px-Injera_2.jpg","KWAN-tah fir-FIR"),
+        dk("Enqulal Firfir","እንቁላል ፍርፍር","breakfast","All Ethiopia","Scrambled eggs mixed with torn injera, tomatoes, and jalapeños.","https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Scrambled_eggs.jpg/1280px-Scrambled_eggs.jpg","en-koo-LAL fir-FIR"),
+        dk("Kategna","ካተኛ","snack","All Ethiopia","Toasted injera brushed with berbere and niter kibbeh — a beloved snack.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Injera_2.jpg/1280px-Injera_2.jpg","kah-TEG-nah"),
         # ── Breakfast ──
-        dk("Chechebsa","ጨጨብሳ","breakfast","Oromia","Shredded flatbread tossed with niter kibbeh and berbere.",IMG,"cheh-cheb-SAH"),
-        dk("Genfo","ገንፎ","breakfast","All Ethiopia","Thick teff porridge with niter kibbeh and berbere at the centre.",IMG,"GEN-foh"),
+        dk("Chechebsa","ጨጨብሳ","breakfast","Oromia","Shredded flatbread tossed with niter kibbeh and berbere.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","cheh-cheb-SAH"),
+        dk("Genfo","ገንፎ","breakfast","All Ethiopia","Thick teff porridge with niter kibbeh and berbere at the centre.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","GEN-foh"),
         dk("Ful Medames","ፉል","breakfast","All Ethiopia","Mashed fava beans with lemon, garlic, and chilli.","https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Ful_medames.jpg/1280px-Ful_medames.jpg","fool meh-DAH-mes"),
-        dk("Enqulal Tibs","እንቁላል ጥብስ","breakfast","All Ethiopia","Ethiopian scrambled eggs sautéed with tomatoes, jalapeños, and onions.",IMG,"en-koo-LAL tibs"),
-        dk("Kinche","ቅንጨ","breakfast","All Ethiopia","Cracked wheat porridge served with niter kibbeh — a warming breakfast.",IMG,"KIN-cheh"),
-        dk("Teff Porridge","ጤፍ ገንፎ","breakfast","All Ethiopia","Simple teff grain porridge cooked with milk or water and a touch of honey.",IMG,"teff GEN-foh"),
+        dk("Enqulal Tibs","እንቁላል ጥብስ","breakfast","All Ethiopia","Ethiopian scrambled eggs sautéed with tomatoes, jalapeños, and onions.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","en-koo-LAL tibs"),
+        dk("Kinche","ቅንጨ","breakfast","All Ethiopia","Cracked wheat porridge served with niter kibbeh — a warming breakfast.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","KIN-cheh"),
+        dk("Teff Porridge","ጤፍ ገንፎ","breakfast","All Ethiopia","Simple teff grain porridge cooked with milk or water and a touch of honey.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","teff GEN-foh"),
         # ── Vegetarian / Fasting ──
-        dk("Beyaynetu","በያይነቱ","main","All Ethiopia","The grand Ethiopian vegetarian platter — colourful fasting dishes on injera.",IMG,"beh-yay-NEH-too"),
-        dk("Timatim Salad","ቲማቲም ሰላጣ","salad","All Ethiopia","Fresh tomato and jalapeño salad dressed with lemon juice and olive oil.",IMG,"tee-mah-TEEM"),
-        dk("Buticha","ቡጢቻ","snack","All Ethiopia","Smooth chickpea dip with lemon, garlic, and jalapeño — served cold.",IMG,"boo-TEE-chah"),
-        dk("Tegabino","ተጋቢኖ","snack","All Ethiopia","Roasted chickpea flour porridge cooked with spiced butter.",IMG,"teh-gah-BEE-noh"),
-        dk("Fassolia","ፋሶሊያ","main","All Ethiopia","White kidney beans slow-cooked with tomatoes, onions, and spices.",IMG,"fah-SOH-lee-ah"),
-        dk("Yetsom Beyaynetu","የጾም በያይነቱ","main","All Ethiopia","A strict fasting platter with no animal products — the full vegan spread.",IMG,"yeh-TSOM beh-yay-NEH-too"),
-        dk("Dinich Alicha","ዲኒች አልጫ","main","All Ethiopia","Potato stew with turmeric and mild spices — simple and comforting.",IMG,"DIH-nich ah-LEE-chah"),
-        dk("Tikel Gomen","ጥቅል ጎመን","main","All Ethiopia","Shredded cabbage sautéed with carrots, turmeric, and garlic.",IMG,"TIH-kel GOH-men"),
-        dk("Yemisir Kik","የምስር ቂቅ","main","All Ethiopia","Split red lentils cooked mild with turmeric — a lighter fasting dish.",IMG,"yeh-MIH-sir kik"),
+        dk("Beyaynetu","በያይነቱ","main","All Ethiopia","The grand Ethiopian vegetarian platter — colourful fasting dishes on injera.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","beh-yay-NEH-too"),
+        dk("Timatim Salad","ቲማቲም ሰላጣ","salad","All Ethiopia","Fresh tomato and jalapeño salad dressed with lemon juice and olive oil.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","tee-mah-TEEM"),
+        dk("Buticha","ቡጢቻ","snack","All Ethiopia","Smooth chickpea dip with lemon, garlic, and jalapeño — served cold.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","boo-TEE-chah"),
+        dk("Tegabino","ተጋቢኖ","snack","All Ethiopia","Roasted chickpea flour porridge cooked with spiced butter.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","teh-gah-BEE-noh"),
+        dk("Fassolia","ፋሶሊያ","main","All Ethiopia","White kidney beans slow-cooked with tomatoes, onions, and spices.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","fah-SOH-lee-ah"),
+        dk("Yetsom Beyaynetu","የጾም በያይነቱ","main","All Ethiopia","A strict fasting platter with no animal products — the full vegan spread.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-TSOM beh-yay-NEH-too"),
+        dk("Dinich Alicha","ዲኒች አልጫ","main","All Ethiopia","Potato stew with turmeric and mild spices — simple and comforting.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","DIH-nich ah-LEE-chah"),
+        dk("Tikel Gomen","ጥቅል ጎመን","main","All Ethiopia","Shredded cabbage sautéed with carrots, turmeric, and garlic.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","TIH-kel GOH-men"),
+        dk("Yemisir Kik","የምስር ቂቅ","main","All Ethiopia","Split red lentils cooked mild with turmeric — a lighter fasting dish.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-MIH-sir kik"),
     ]
 
 
     DISH_DATA += [
         # ── Snacks & Street Food ──
         dk("Sambusa","ሳምቡሳ","snack","All Ethiopia","Crispy fried pastry triangles stuffed with spiced lentils or beef.","https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Samosa_with_dipping_sauce.jpg/1280px-Samosa_with_dipping_sauce.jpg","sam-BOO-sah"),
-        dk("Andeguday","አንደጓይ","snack","Tigray","Spiced minced beef or lentils wrapped in a fried dough pocket.",IMG,"an-deh-GWAI"),
-        dk("Dabo Kolo","ዳቦ ቆሎ","snack","All Ethiopia","Tiny crunchy baked or fried dough bites spiced with berbere.",IMG,"DAH-boh KOH-loh"),
-        dk("Kolo","ቆሎ","snack","All Ethiopia","Roasted barley, chickpeas, and sunflower seeds — the Ethiopian trail mix.",IMG,"KOH-loh"),
-        dk("Fetira","ፈጢራ","snack","All Ethiopia","Thin fried flatbread drizzled with honey or filled with eggs.",IMG,"feh-TEE-rah"),
+        dk("Andeguday","አንደጓይ","snack","Tigray","Spiced minced beef or lentils wrapped in a fried dough pocket.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","an-deh-GWAI"),
+        dk("Dabo Kolo","ዳቦ ቆሎ","snack","All Ethiopia","Tiny crunchy baked or fried dough bites spiced with berbere.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","DAH-boh KOH-loh"),
+        dk("Kolo","ቆሎ","snack","All Ethiopia","Roasted barley, chickpeas, and sunflower seeds — the Ethiopian trail mix.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","KOH-loh"),
+        dk("Fetira","ፈጢራ","snack","All Ethiopia","Thin fried flatbread drizzled with honey or filled with eggs.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","feh-TEE-rah"),
         # ── Condiments & Sauces ──
-        dk("Niter Kibbeh","ንጥር ቅቤ","condiment","All Ethiopia","Ethiopian spiced clarified butter with onion, garlic, ginger, and warming spices.",IMG,"NIH-ter kib-BEH"),
-        dk("Ayib","አይብ","condiment","All Ethiopia","Ethiopian fresh cottage cheese — mild and crumbly, served with spicy stews.",IMG,"AH-yib"),
-        dk("Berbere","በርበሬ","condiment","All Ethiopia","The bold Ethiopian spice blend — chilli, fenugreek, coriander, and more.",IMG,"ber-BEH-reh"),
-        dk("Mitmita","ምጥሚጣ","condiment","All Ethiopia","A fiery Ethiopian spice blend with bird's eye chilli and cardamom.",IMG,"mit-MEE-tah"),
-        dk("Awaze","አዋዜ","condiment","All Ethiopia","Spicy Ethiopian chilli paste made with berbere, tej, and niter kibbeh.",IMG,"ah-WAH-zeh"),
+        dk("Niter Kibbeh","ንጥር ቅቤ","condiment","All Ethiopia","Ethiopian spiced clarified butter with onion, garlic, ginger, and warming spices.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","NIH-ter kib-BEH"),
+        dk("Ayib","አይብ","condiment","All Ethiopia","Ethiopian fresh cottage cheese — mild and crumbly, served with spicy stews.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","AH-yib"),
+        dk("Berbere","በርበሬ","condiment","All Ethiopia","The bold Ethiopian spice blend — chilli, fenugreek, coriander, and more.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","ber-BEH-reh"),
+        dk("Mitmita","ምጥሚጣ","condiment","All Ethiopia","A fiery Ethiopian spice blend with bird's eye chilli and cardamom.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","mit-MEE-tah"),
+        dk("Awaze","አዋዜ","condiment","All Ethiopia","Spicy Ethiopian chilli paste made with berbere, tej, and niter kibbeh.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","ah-WAH-zeh"),
         # ── Soups ──
-        dk("Shorba","ሾርባ","main","All Ethiopia","Ethiopian lamb or beef soup with vegetables, spices, and noodles.",IMG,"SHOR-bah"),
-        dk("Yetsom Shorba","የጾም ሾርባ","main","All Ethiopia","Fasting vegetable soup with lentils, tomatoes, and mild spices.",IMG,"yeh-TSOM SHOR-bah"),
+        dk("Shorba","ሾርባ","main","All Ethiopia","Ethiopian lamb or beef soup with vegetables, spices, and noodles.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","SHOR-bah"),
+        dk("Yetsom Shorba","የጾም ሾርባ","main","All Ethiopia","Fasting vegetable soup with lentils, tomatoes, and mild spices.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-TSOM SHOR-bah"),
         # ── Breads ──
-        dk("Ambasha","አምባሻ","snack","Tigray / Amhara","Decorative round flatbread stamped with patterns — baked for celebrations.",IMG,"am-BAH-shah"),
-        dk("Dabo","ዳቦ","snack","All Ethiopia","Ethiopian honey bread — slightly sweet, soft, and fluffy.",IMG,"DAH-boh"),
-        dk("Kita","ቂጣ","breakfast","All Ethiopia","Thin unleavened flatbread pan-cooked and served with niter kibbeh.",IMG,"KEE-tah"),
+        dk("Ambasha","አምባሻ","snack","Tigray / Amhara","Decorative round flatbread stamped with patterns — baked for celebrations.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","am-BAH-shah"),
+        dk("Dabo","ዳቦ","snack","All Ethiopia","Ethiopian honey bread — slightly sweet, soft, and fluffy.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","DAH-boh"),
+        dk("Kita","ቂጣ","breakfast","All Ethiopia","Thin unleavened flatbread pan-cooked and served with niter kibbeh.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","KEE-tah"),
         # ── Drinks ──
-        dk("Tej","ጠጅ","main","All Ethiopia","Traditional Ethiopian honey wine — amber, slightly fizzy, mildly sweet.",IMG,"tehj"),
-        dk("Tella","ጠላ","main","All Ethiopia","Traditional Ethiopian home-brewed sorghum beer — earthy and lightly sour.",IMG,"TEL-lah"),
-        dk("Buna","ቡና","main","All Ethiopia","The Ethiopian coffee ceremony — freshly roasted and brewed with popcorn.",IMG,"BOO-nah"),
-        dk("Shameta","ሻሜታ","main","Amhara","Soured milk drink mixed with barley flour — refreshing and tangy.",IMG,"shah-MEH-tah"),
-        dk("Atmet","አጥሜት","breakfast","All Ethiopia","A warm drink made of roasted barley flour, niter kibbeh, and honey.",IMG,"at-MET"),
+        dk("Tej","ጠጅ","main","All Ethiopia","Traditional Ethiopian honey wine — amber, slightly fizzy, mildly sweet.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","tehj"),
+        dk("Tella","ጠላ","main","All Ethiopia","Traditional Ethiopian home-brewed sorghum beer — earthy and lightly sour.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","TEL-lah"),
+        dk("Buna","ቡና","main","All Ethiopia","The Ethiopian coffee ceremony — freshly roasted and brewed with popcorn.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","BOO-nah"),
+        dk("Shameta","ሻሜታ","main","Amhara","Soured milk drink mixed with barley flour — refreshing and tangy.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","shah-MEH-tah"),
+        dk("Atmet","አጥሜት","breakfast","All Ethiopia","A warm drink made of roasted barley flour, niter kibbeh, and honey.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","at-MET"),
     ]
 
 
     DISH_DATA += [
         # ── Regional Specialties ──
-        dk("Tigrayan Zigni","ትግራይ ዝግኒ","main","Tigray","Tigrayan slow-cooked lamb or beef in a deeply spiced berbere sauce.",IMG,"zig-NEE"),
-        dk("Tihlo","ጥሕሎ","main","Tigray","Barley flour dumplings served with a spiced lamb or beef broth.",IMG,"TIH-loh"),
-        dk("Shahan Ful","ሻሃን ፉል","breakfast","Harar","Harar-style fava beans cooked with clarified butter and served in clay bowls.",IMG,"shah-HAN fool"),
-        dk("Ye'dorho Wot be Doro","የዶርሆ ወጥ","main","Wolaita","Wolaita-style chicken stew with kocho flatbread instead of injera.",IMG,"yeh-DOR-hoh wot"),
-        dk("Kocho","ቆጮ","main","Southern Ethiopia","Fermented false banana flatbread from Southern Ethiopia — dense and earthy.",IMG,"KOH-choh"),
-        dk("Bulla","ቡላ","breakfast","Southern Ethiopia","Starchy porridge made from the false banana plant — smooth and mild.",IMG,"BOO-lah"),
-        dk("Enjera Firfir be Doro","እንጀራ ፍርፍር በዶሮ","main","All Ethiopia","Firfir enriched with shredded chicken — a heartier version of the classic.",IMG,"en-JEH-rah fir-FIR"),
+        dk("Tigrayan Zigni","ትግራይ ዝግኒ","main","Tigray","Tigrayan slow-cooked lamb or beef in a deeply spiced berbere sauce.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","zig-NEE"),
+        dk("Tihlo","ጥሕሎ","main","Tigray","Barley flour dumplings served with a spiced lamb or beef broth.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","TIH-loh"),
+        dk("Shahan Ful","ሻሃን ፉል","breakfast","Harar","Harar-style fava beans cooked with clarified butter and served in clay bowls.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","shah-HAN fool"),
+        dk("Ye'dorho Wot be Doro","የዶርሆ ወጥ","main","Wolaita","Wolaita-style chicken stew with kocho flatbread instead of injera.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-DOR-hoh wot"),
+        dk("Kocho","ቆጮ","main","Southern Ethiopia","Fermented false banana flatbread from Southern Ethiopia — dense and earthy.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","KOH-choh"),
+        dk("Bulla","ቡላ","breakfast","Southern Ethiopia","Starchy porridge made from the false banana plant — smooth and mild.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","BOO-lah"),
+        dk("Enjera Firfir be Doro","እንጀራ ፍርፍር በዶሮ","main","All Ethiopia","Firfir enriched with shredded chicken — a heartier version of the classic.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","en-JEH-rah fir-FIR"),
         # ── Desserts & Sweets ──
-        dk("Ye'asel Dabo","የዓሥለ ዳቦ","snack","All Ethiopia","Ethiopian sweet honey cake served at holidays and celebrations.",IMG,"yeh-AH-sel DAH-boh"),
-        dk("Himbasha","ሂምባሻ","snack","Eritrea / Tigray","Celebration bread flavoured with cardamom and black seed — soft and fragrant.",IMG,"him-BAH-shah"),
+        dk("Ye'asel Dabo","የዓሥለ ዳቦ","snack","All Ethiopia","Ethiopian sweet honey cake served at holidays and celebrations.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-AH-sel DAH-boh"),
+        dk("Himbasha","ሂምባሻ","snack","Eritrea / Tigray","Celebration bread flavoured with cardamom and black seed — soft and fragrant.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","him-BAH-shah"),
         # ── Organ Meat & Offal ──
-        dk("Tire Siga","ጥሬ ስጋ","main","All Ethiopia","Fresh raw beef served immediately after slaughter — the Ethiopian sashimi.",IMG,"TIH-reh SIH-gah"),
-        dk("Feseg","ፌሰግ","main","Amhara","Special lamb dish prepared for Easter — slow-cooked with spiced butter.",IMG,"FEH-seg"),
-        dk("Kurt","ቁርጥ","main","All Ethiopia","Fresh-cut raw or lightly cooked beef chunks seasoned at the table.",IMG,"koort"),
+        dk("Tire Siga","ጥሬ ስጋ","main","All Ethiopia","Fresh raw beef served immediately after slaughter — the Ethiopian sashimi.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","TIH-reh SIH-gah"),
+        dk("Feseg","ፌሰግ","main","Amhara","Special lamb dish prepared for Easter — slow-cooked with spiced butter.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","FEH-seg"),
+        dk("Kurt","ቁርጥ","main","All Ethiopia","Fresh-cut raw or lightly cooked beef chunks seasoned at the table.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","koort"),
         # ── Egg Dishes ──
-        dk("Enqulal be Timatim","እንቁላል በቲማቲም","breakfast","All Ethiopia","Eggs poached in a spiced tomato sauce with jalapeños and onions.",IMG,"en-koo-LAL beh tee-mah-TEEM"),
+        dk("Enqulal be Timatim","እንቁላል በቲማቲም","breakfast","All Ethiopia","Eggs poached in a spiced tomato sauce with jalapeños and onions.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","en-koo-LAL beh tee-mah-TEEM"),
         # ── More Legumes ──
-        dk("Yebeg Alicha","የበግ አልጫ","main","All Ethiopia","Mild lamb stew with turmeric, ginger, and potato — tender and fragrant.",IMG,"yeh-BEG ah-LEE-chah"),
-        dk("Yebeg Wat","የበግ ወጥ","main","All Ethiopia","Spiced lamb stew cooked in berbere and niter kibbeh.",IMG,"yeh-BEG waht"),
-        dk("Kikil","ቂቅል","main","All Ethiopia","Boiled lamb or goat leg served with broth and awaze dipping sauce.",IMG,"kee-KIL"),
+        dk("Yebeg Alicha","የበግ አልጫ","main","All Ethiopia","Mild lamb stew with turmeric, ginger, and potato — tender and fragrant.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-BEG ah-LEE-chah"),
+        dk("Yebeg Wat","የበግ ወጥ","main","All Ethiopia","Spiced lamb stew cooked in berbere and niter kibbeh.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","yeh-BEG waht"),
+        dk("Kikil","ቂቅል","main","All Ethiopia","Boiled lamb or goat leg served with broth and awaze dipping sauce.","https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ethiopian_cuisine.jpg/1280px-Ethiopian_cuisine.jpg","kee-KIL"),
     ]
 
     existing = await dishes.count_documents({})
@@ -344,3 +344,4 @@ async def seed_dishes_endpoint(secret: str):
             await dishes.update_one({"_id":did},{"$set":{"variation_count":1}})
 
     return {"seeded_dishes": len(result.inserted_ids), "seeded_variations": len(var_docs)}
+
