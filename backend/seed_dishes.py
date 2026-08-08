@@ -1,8 +1,17 @@
-"""Run once: python seed_dishes.py — populates MongoDB dishes + variations."""
+"""Run once: python seed_dishes.py — populates MongoDB dishes + variations.
+
+Image handling: each dish's hardcoded `img` below is only a LAST-RESORT
+fallback (several of these were wrong or dead links — the exact bug this
+seed script now fixes). At seed time, `resolve_dish_images()` looks up a
+real, verified photo of each specific dish on Wikimedia Commons and uses
+that instead. Nothing gets written to Mongo, and nothing renders on the
+site, until the image is confirmed to actually exist.
+"""
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from datetime import datetime, timezone
 from dotenv import load_dotenv
+import httpx
 import os
 
 load_dotenv()
@@ -12,6 +21,54 @@ DB_NAME = os.getenv("DB_NAME", "megeb")
 
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
+
+COMMONS_API = "https://commons.wikimedia.org/w/api.php"
+
+
+async def find_authentic_image(client: httpx.AsyncClient, dish_name: str) -> str | None:
+    """Search Wikimedia Commons for a real photo of this specific dish and
+    return a direct, working image URL — or None if nothing suitable is found.
+    Tries a food-specific query first, then a looser one, so obscure dishes
+    still get a shot at a real match instead of falling through silently."""
+    queries = [f"{dish_name} Ethiopian food dish", f"{dish_name} Ethiopia"]
+    for q in queries:
+        try:
+            resp = await client.get(COMMONS_API, params={
+                "action": "query",
+                "format": "json",
+                "generator": "search",
+                "gsrsearch": f"{q} filetype:bitmap",
+                "gsrnamespace": 6,
+                "gsrlimit": 5,
+                "prop": "imageinfo",
+                "iiprop": "url",
+                "iiurlwidth": 800,
+            })
+            resp.raise_for_status()
+            pages = resp.json().get("query", {}).get("pages", {})
+            for page in pages.values():
+                info = (page.get("imageinfo") or [{}])[0]
+                url = info.get("thumburl") or info.get("url")
+                if url and url.lower().split("?")[0].endswith((".jpg", ".jpeg", ".png")):
+                    return url
+        except (httpx.HTTPError, ValueError, KeyError):
+            continue
+    return None
+
+
+async def resolve_dish_images(dishes: list[dict]) -> None:
+    """Mutates each dish dict in place, replacing reference_image_url with a
+    verified real photo of that dish when one can be found. On any network
+    failure, or when nothing relevant turns up, the existing hardcoded value
+    is left untouched so seeding still succeeds."""
+    async with httpx.AsyncClient(timeout=10, headers={"User-Agent": "MegebSeed/1.0"}) as client:
+        for d in dishes:
+            found = await find_authentic_image(client, d["name"])
+            if found:
+                d["reference_image_url"] = found
+                print(f"  ✓ {d['name']}: found authentic image")
+            else:
+                print(f"  · {d['name']}: using fallback image (no Commons match)")
 
 
 def dish(name, name_am, category, region, desc, img, phonetic=""):
@@ -416,6 +473,9 @@ async def seed():
         print(f"Found {existing} existing dishes — dropping and reseeding.")
         await dishes_col.drop()
         await variations_col.drop()
+
+    print("Looking up authentic photos for each dish on Wikimedia Commons…")
+    await resolve_dish_images(DISHES)
 
     result = await dishes_col.insert_many(DISHES)
     print(f"Seeded {len(result.inserted_ids)} dishes.")
