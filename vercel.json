@@ -7,35 +7,35 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://megeb-backend.onrender.com/api/:path*"
+      "destination": "https://megeb.onrender.com/api/:path*"
     },
     {
       "source": "/auth/:path*",
-      "destination": "https://megeb-backend.onrender.com/auth/:path*"
+      "destination": "https://megeb.onrender.com/auth/:path*"
     },
     {
       "source": "/ai/:path*",
-      "destination": "https://megeb-backend.onrender.com/ai/:path*"
+      "destination": "https://megeb.onrender.com/ai/:path*"
     },
     {
       "source": "/pantry/:path*",
-      "destination": "https://megeb-backend.onrender.com/pantry/:path*"
+      "destination": "https://megeb.onrender.com/pantry/:path*"
     },
     {
       "source": "/meal-plan/:path*",
-      "destination": "https://megeb-backend.onrender.com/meal-plan/:path*"
+      "destination": "https://megeb.onrender.com/meal-plan/:path*"
     },
     {
       "source": "/nutrition/:path*",
-      "destination": "https://megeb-backend.onrender.com/nutrition/:path*"
+      "destination": "https://megeb.onrender.com/nutrition/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://megeb-backend.onrender.com/uploads/:path*"
+      "destination": "https://megeb.onrender.com/uploads/:path*"
     },
     {
       "source": "/health",
-      "destination": "https://megeb-backend.onrender.com/health"
+      "destination": "https://megeb.onrender.com/health"
     }
   ]
 }

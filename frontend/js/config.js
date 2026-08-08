@@ -13,5 +13,5 @@ if (hostname === 'localhost' || hostname === '127.0.0.1') {
   API_BASE_URL = '';
 } else {
   // Render or any other host: direct backend URL
-  API_BASE_URL = 'https://megeb-backend.onrender.com';
+  API_BASE_URL = 'https://megeb.onrender.com';
 }
