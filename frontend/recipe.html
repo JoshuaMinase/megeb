@@ -428,19 +428,6 @@
       updateIndicator(0);
     }
 
-    function extractYouTubeId(url) {
-      if (!url) return '';
-      const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-        /youtube\.com\/embed\/([^&\n?#]+)/,
-      ];
-      for (const pattern of patterns) {
-        const match = url.match(pattern);
-        if (match) return match[1];
-      }
-      return url;
-    }
-
     function updateIndicator(idx) {
       const pill = document.getElementById(`pill-${idx}`);
       const indicator = document.getElementById('pill-indicator');
@@ -546,21 +533,6 @@
             </div>
           </div>
         </div>
-        ${v.youtube_url || currentDish.youtube_url ? `
-        <div class="youtube-section" style="padding: 40px 8%; background: #fafaf8;">
-          <h2 style="font-family:'Times New Roman',serif; font-size: 24px; color: #263020; margin-bottom: 24px;">📺 Video Tutorial</h2>
-          <div style="position: relative; width: 100%; max-width: 800px; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12);">
-            <iframe 
-              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 12px;"
-              src="https://www.youtube.com/embed/${extractYouTubeId(v.youtube_url || currentDish.youtube_url)}" 
-              allowfullscreen="" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              loading="lazy">
-            </iframe>
-          </div>
-          <p style="font-family: Georgia,serif; color: #777; margin-top: 16px; font-size: 14px;">Watch variations and tips for preparing this dish.</p>
-        </div>
-        ` : ''}
         <div class="steps-section">
           <div class="steps-container">
             <h2 class="steps-title">Preparation Method</h2>
