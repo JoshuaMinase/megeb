@@ -170,6 +170,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/dish-image.js"></script>
   <script>
     updateNav();
 
@@ -211,7 +212,7 @@
       if (dish) {
         inner.innerHTML = `
           <div class="slot-picked">
-            <img src="${dish.reference_image_url || 'images/food-doro.jpg'}" alt="${dish.name}" onerror="this.src='images/food-doro.jpg'">
+            <img src="${getDishImageSrc(dish)}" alt="${dish.name}" onerror="dishImageFallbackByName(this, '${(dish.name||'').replace(/'/g, "\\'")}', '${dish.category||''}')">
             <div class="slot-picked-info">
               <strong>${dish.name}</strong>
               <small>${dish.category || ''}</small>
@@ -284,7 +285,7 @@
 
       document.getElementById('table-grid').innerHTML = picked.map(s => `
         <div class="table-dish" onclick="window.open('recipe.html?slug=${s.dish.slug}','_blank')">
-          <img src="${s.dish.reference_image_url || 'images/food-doro.jpg'}" alt="${s.dish.name}" onerror="this.src='images/food-doro.jpg'">
+          <img src="${getDishImageSrc(s.dish)}" alt="${s.dish.name}" onerror="dishImageFallbackByName(this, '${(s.dish.name||'').replace(/'/g, "\\'")}', '${s.dish.category||''}')">
           <div class="table-dish-name">${s.dish.name}</div>
           <div class="table-dish-role">${s.label}</div>
         </div>`).join('');
