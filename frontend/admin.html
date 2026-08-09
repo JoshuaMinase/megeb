@@ -112,6 +112,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/dish-image.js"></script>
   <script>
     const user = getUser();
 
@@ -153,10 +154,10 @@
     }
 
     function dishCard(d) {
-      const img = d.reference_image_url || 'images/food-doro.jpg';
+      const img = getDishImageSrc(d);
       return `
         <div class="queue-item" id="dish-${d.id}">
-          <img src="${img}" onerror="this.src='images/food-doro.jpg'" alt="${d.name}">
+          <img src="${img}" onerror="dishImageFallbackByName(this, '${(d.name||'').replace(/'/g, "\\'")}', '${d.category||''}')" alt="${d.name}">
           <div class="queue-item-body">
             <h3>${d.name}${d.name_amharic ? ` <small style="color:#aaa;font-size:14px;">${d.name_amharic}</small>` : ''}</h3>
             <div class="meta">${d.category || '—'} ${d.region ? '· ' + d.region : ''} · submitted by user</div>
@@ -170,11 +171,11 @@
     }
 
     function varCard(v) {
-      const img = v.image_url || 'images/food-doro.jpg';
+      const img = v.image_url && v.image_url.trim() ? v.image_url : getDishImageSrc({ name: v.variation_name });
       const ings = (v.ingredients || []).slice(0, 4).join(', ') + (v.ingredients?.length > 4 ? '…' : '');
       return `
         <div class="queue-item" id="var-${v.id}">
-          <img src="${img}" onerror="this.src='images/food-doro.jpg'" alt="${v.variation_name}">
+          <img src="${img}" onerror="dishImageFallbackByName(this, '${(v.variation_name||'').replace(/'/g, "\\'")}', '')" alt="${v.variation_name}">
           <div class="queue-item-body">
             <h3>${v.variation_name}</h3>
             <div class="meta">dish_id: ${v.dish_id} · by ${v.author_name || 'unknown'} · 🌶 ${v.spice_level || '—'}</div>
