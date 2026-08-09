@@ -87,6 +87,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/dish-image.js"></script>
   <script src="js/main.js"></script>
   <script>
     updateNav();
@@ -119,7 +120,7 @@
 
       document.getElementById('dishes-grid').innerHTML = collectionDishes.map(d => `
         <div class="food-item" onclick="window.location.href='recipe.html?slug=${d.slug}'">
-          <img src="${d.reference_image_url || 'images/food-doro.jpg'}" alt="${d.name}" onerror="this.src='images/food-doro.jpg'">
+          <img src="${getDishImageSrc(d)}" alt="${d.name}" onerror="dishImageFallbackByName(this, '${(d.name||'').replace(/'/g, "\\'")}', '${d.category||''}')">
           <div class="food-item-body">
             <h3>${d.name}</h3>
             ${d.name_amharic ? `<div class="amharic">${d.name_amharic}</div>` : ''}
