@@ -1,19 +1,16 @@
 # Environment
 .env
-.env.example
+.env.local
 backend/.env
-
-# Render
-.renderignore
-
-# Vercel
-.vercel
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
+.venv/
+venv/
 
 # OS
 .DS_Store
@@ -25,8 +22,22 @@ node_modules/
 # Uploads (user-generated content, not source)
 backend/uploads/
 
-# Design/AI files
+# Epub / book files (large, processed — images already on Cloudinary)
+*.epub
+epub_extracted/
+
+# Temp/scratch files
+tmp_*.py
+gursha_temp.zip
+
+# Design/AI tool folders
+.devin/
+.kombai/
+.aider*
 *.ai
 
-# Aider
-.aider*
+# Vercel
+.vercel
+
+# Render
+.renderignore

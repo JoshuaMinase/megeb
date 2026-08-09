@@ -1,114 +1,191 @@
-# Megeb — Ethiopian Recipe Platform
+<div align="center">
 
-A people's recipe platform where anyone can share food and ingredients.
-Features: dish feed with variation system, nationality-based recommendations, trending, search, auth, pantry, nutrition log, meal planner, AI recipe generation.
+# 🍽️ Megeb - Ethiopian Recipe Platform
 
----
+*A modern, community-driven recipe platform featuring authentic Ethiopian cuisine powered by AI*
 
-## Stack
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6-green?logo=fastapi)](https://fastapi.tiangolo.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)](https://www.mongodb.com/atlas)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Image%20Storage-blue?logo=cloudinary)](https://cloudinary.com)
 
-- **Frontend** — plain HTML/CSS/JS (no build step)
-- **Backend** — FastAPI + Motor (async MongoDB)
-- **Database** — MongoDB Atlas (production) or local MongoDB (development)
-- **Image Storage** — Cloudinary
-- **AI** — Groq API
+</div>
 
----
+## ✨ Features
 
+- **🍴 Extensive Recipe Database** - 79+ authentic Ethiopian dishes with real cookbook photography
+- **🤖 AI-Powered Search** - Intelligent recipe discovery using RAG (Retrieval-Augmented Generation) with Groq
+- **👥 Community Contributions** - User-submitted recipes with moderation system
+- **🌍 Personalized Experience** - Nationality-based recommendations and trending dishes
+- **📸 Rich Media** - High-quality images hosted on Cloudinary
+- **🔐 Secure Authentication** - JWT-based auth with role-based access control
+- **📊 Meal Planning** - Integrated pantry management and nutrition tracking
+- **🔄 Recipe Variations** - Multiple recipe variations per dish with rating system
 
-## How personalisation works
+## 🏗️ Architecture
 
-1. User signs up → chooses nationality
-2. `GET /recipes/` checks JWT → gets user nationality
-3. MongoDB aggregation scores matching-nationality recipes higher
-4. `GET /api/dishes` returns approved dishes sorted by variation count + recency
+### Tech Stack
 
-## Moderation flow
+- **Frontend**: Plain HTML/CSS/JavaScript (no build step required)
+- **Backend**: FastAPI with Motor (async MongoDB driver)
+- **Database**: MongoDB Atlas (production) or local MongoDB (development)
+- **Image Storage**: Cloudinary CDN
+- **AI**: Groq API for intelligent recipe generation and search
+- **Authentication**: JWT with bcrypt password hashing
 
-1. User submits dish or variation → `status: "pending"`
-2. Admin sees it in `/api/moderation/queue`
-3. Admin approves → `status: "approved"`, appears in feed
-4. Dish `variation_count` is incremented when a variation is approved
-
-## Admin setup
-
-Promote a user to admin directly in MongoDB:
+### System Design
 
 ```
-db.users.updateOne({ email: "your@email.com" }, { $set: { role: "admin" } })
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend      │    │   MongoDB       │
+│  (Static HTML)  │◄──►│   (FastAPI)     │◄──►│    Atlas        │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                              │
+                              ▼
+                       ┌──────────────┐
+                       │  Cloudinary  │
+                       │   Images     │
+                       └──────────────┘
 ```
 
----
+## 🚀 Quick Start
 
-## Deployment
+### Prerequisites
 
-### Quick Start with Docker Compose
+- Python 3.8+
+- MongoDB Atlas account (free tier available)
+- Cloudinary account (free tier available)
+- Groq API key (free tier available)
+
+### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/yourusername/megeb.git
    cd megeb
    ```
 
 2. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Edit .env with your actual values:
-   # - MONGO_URL: Your MongoDB Atlas connection string
-   # - JWT_SECRET: generate a secure random string
-   # - GROQ_API_KEY: get from https://console.groq.com/
-   # - CLOUDINARY_*: get from https://cloudinary.com/
+   # Edit .env with your actual configuration
    ```
 
-3. **Start the application**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-
-### Manual Deployment
-
-#### Backend
-
-1. **Install dependencies**
+3. **Install backend dependencies**
    ```bash
    cd backend
    pip install -r requirements.txt
    ```
 
-2. **Set environment variables**
+4. **Seed the database with Ethiopian recipes**
    ```bash
-   export MONGO_URL="mongodb+srv://user:pass@cluster.mongodb.net/?appName=Cluster0"
-   export JWT_SECRET="your-secret-key"
-   export GROQ_API_KEY="your-groq-key"
-   export CLOUDINARY_CLOUD_NAME="your-cloud-name"
-   export CLOUDINARY_API_KEY="your-api-key"
-   export CLOUDINARY_API_SECRET="your-api-secret"
-   export CORS_ORIGINS="http://localhost:3000"
+   python seed_gursha.py
    ```
 
-3. **Run the backend**
+5. **Index recipes for AI search**
    ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000
+   python rag_index.py
    ```
+
+6. **Start the backend server**
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+7. **Serve the frontend**
+   ```bash
+   # In a new terminal
+   cd frontend
+   python -m http.server 3000
+   ```
+
+8. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
+
+## 📁 Project Structure
+
+```
+megeb/
+├── backend/
+│   ├── main.py                 # FastAPI application entry point
+│   ├── seed_gursha.py          # Ethiopian recipes seeder
+│   ├── rag_index.py            # AI search indexing
+│   ├── requirements.txt        # Python dependencies
+│   ├── models/                 # Pydantic models
+│   ├── routes/                 # API route handlers
+│   │   ├── auth_routes.py      # Authentication endpoints
+│   │   ├── dish_routes.py      # Dish/recipe endpoints
+│   │   ├── ai_routes.py        # AI-powered endpoints
+│   │   └── ...
+│   └── ...
+├── frontend/
+│   ├── foods.html              # Main recipe feed
+│   ├── login.html              # Authentication pages
+│   ├── signup.html
+│   ├── js/                     # Frontend JavaScript
+│   │   ├── config.js           # API configuration
+│   │   ├── auth.js             # Authentication logic
+│   │   └── ...
+│   └── css/                    # Styling
+├── .env.example                # Environment variables template
+├── .gitignore                  # Git ignore rules
+├── LICENSE                     # MIT License
+├── README.md                   # This file
+└── render.yaml                 # Render deployment config
+```
+
+## 🔧 Configuration
+
+### Required Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MONGO_URL` | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/megeb` |
+| `DB_NAME` | Database name | `megeb` |
+| `JWT_SECRET` | Secret key for JWT token generation | `your-super-secret-key` |
+| `GROQ_API_KEY` | Groq API key for AI features | `gsk_...` |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | `your-cloud-name` |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | `123456789` |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | `your-secret` |
+| `CORS_ORIGINS` | Allowed CORS origins | `http://localhost:3000,https://yourdomain.com` |
+
+## 🌐 Deployment
+
+### Render Deployment (Recommended)
+
+The project includes `render.yaml` for easy deployment to Render:
+
+1. **Push your code to GitHub**
+2. **Create a new web service on Render**
+3. **Connect your GitHub repository**
+4. **Render will auto-detect the Python service**
+5. **Set environment variables in Render dashboard**
+6. **Deploy!**
+
+### Manual Deployment
+
+#### Backend
+
+```bash
+cd backend
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
 
 #### Frontend
 
-The frontend is static HTML/CSS/JS. Serve it with any web server:
+The frontend is static and can be served by any web server:
 
-**Using nginx:**
+**Nginx example:**
 ```nginx
 server {
     listen 80;
-    root /path/to/frontend;
+    root /path/to/megeb/frontend;
     index index.html;
 
     location /api/ {
         proxy_pass http://localhost:8000;
-        proxy_set_header Host $host;
     }
 
     location / {
@@ -117,133 +194,94 @@ server {
 }
 ```
 
-**Using Python:**
-```bash
-cd frontend
-python -m http.server 3000
+## 🤖 AI Features
+
+### RAG-Powered Search
+
+The platform uses Retrieval-Augmented Generation for intelligent recipe search:
+
+- **3,277 indexed chunks** from the Gursha cookbook
+- **Context-aware responses** grounded in authentic recipes
+- **3 AI endpoints**: Chat, Generate, and Fix Recipe
+
+### AI Endpoints
+
+- `POST /ai/chat` - Conversational recipe assistance
+- `POST /ai/generate` - Generate new recipes from descriptions
+- `POST /ai/fix` - Fix and improve existing recipes
+
+## 📊 Database Schema
+
+### Collections
+
+- **users** - User accounts with authentication and preferences
+- **dishes** - Main recipe dishes with metadata and images
+- **recipe_variations** - Multiple recipe variations per dish
+- **rag_chunks** - Indexed text chunks for AI search
+- **pantry_items** - User pantry management
+- **meal_plans** - User meal planning
+
+## 🔐 Authentication & Authorization
+
+### User Roles
+
+- **user** - Standard user access
+- **admin** - Full administrative privileges
+
+### Admin Setup
+
+Promote a user to admin directly in MongoDB:
+
+```javascript
+db.users.updateOne(
+  { email: "admin@example.com" },
+  { $set: { role: "admin" } }
+)
 ```
 
-### Production Considerations
+## 🧪 Testing
 
-- Use MongoDB Atlas for production database
-- Set strong JWT_SECRET and rotate it regularly
-- Enable HTTPS/TLS
-- Configure proper CORS origins for your domain
-- Use a production WSGI server like Gunicorn with Uvicorn workers
-- Set up proper logging and monitoring
-- Configure Cloudinary for production image storage
+### API Testing
+
+The FastAPI auto-generated documentation at `/docs` provides interactive API testing.
+
+### Manual Testing
+
+1. **Test user registration**: `POST /auth/signup`
+2. **Test login**: `POST /auth/login`
+3. **Test recipe feed**: `GET /api/dishes`
+4. **Test AI search**: `POST /ai/chat`
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Gursha Cookbook** - Authentic Ethiopian recipes from "Gursha: Timeless Recipes for Modern Kitchens"
+- **Ethiopian Community** - Cultural insights and recipe validation
+- **Open Source Community** - Tools and libraries that make this project possible
+
+## 📞 Support
+
+For support, please open an issue in the GitHub repository or contact the maintainers.
 
 ---
 
-## Hybrid Deployment (Recommended)
+<div align="center">
 
-### Architecture
-- **Frontend**: Vercel (static site with global CDN)
-- **Backend**: Render (Python FastAPI web service)
-- **Database**: MongoDB Atlas (shared between both)
+**Built with ❤️ for the Ethiopian food community**
 
-### Quick Deploy
+[⭐ Star this repo](https://github.com/yourusername/megeb) • [🐛 Report issues](https://github.com/yourusername/megeb/issues) • [📖 Documentation](https://github.com/yourusername/megeb/wiki)
 
-#### 1. Deploy Backend to Render
-📄 **Detailed guide: [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)**
-
-```bash
-# Push to GitHub
-git add .
-git commit -m "Add deployment configuration"
-git push origin main
-
-# Deploy to Render using render.yaml
-# Backend will be deployed as Python web service
-```
-
-**Backend URL**: `https://megeb-backend.onrender.com`
-
-#### 2. Deploy Frontend to Vercel
-📄 **Detailed guide: [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md)**
-
-```bash
-# Import repository in Vercel
-# Vercel will auto-detect vercel.json
-# Frontend will be deployed as static site
-```
-
-**Frontend URL**: `https://your-app.vercel.app`
-
-#### 3. Configure CORS
-After both deployments, update backend CORS origins:
-```
-https://megeb-backend.onrender.com,https://your-vercel-app.vercel.app
-```
-
-### Benefits of Hybrid Deployment
-- ✅ **Performance**: Vercel's global CDN for static assets
-- ✅ **Cost**: Both platforms have generous free tiers
-- ✅ **Scalability**: Scale frontend and backend independently
-- ✅ **Reliability**: Redundant deployment across platforms
-- ✅ **Developer Experience**: Excellent DX on both platforms
-
----
-
-## Alternative: All-in-One Render Deployment
-
-📄 **Detailed guide: [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)**
-
-If you prefer to deploy both frontend and backend on Render:
-
-1. **Deploy using render.yaml**
-   - Render will create both services
-   - Frontend: Static site
-   - Backend: Python web service
-
-2. **Access your application**
-   - Frontend: `https://megeb-frontend.onrender.com`
-   - Backend: `https://megeb-backend.onrender.com`
-
-### Render-Specific Considerations
-
-- **Free Tier**: Render's free tier has spin-up time (services sleep when inactive)
-- **Environment Variables**: Must be set in Render dashboard
-- **Database**: Use MongoDB Atlas for best performance
-- **File Storage**: Use Cloudinary for image uploads
-- **Logging**: Check Render dashboard for logs
-
----
-
-## Environment Configuration
-
-### Required Environment Variables
-
-For both deployment methods, configure these in your platform's dashboard:
-
-**Database:**
-- `MONGO_URL`: MongoDB Atlas connection string
-
-**Authentication:**
-- `JWT_SECRET`: Auto-generated by Render (set manually for other platforms)
-
-**AI Features:**
-- `GROQ_API_KEY`: Your Groq API key for AI recipe generation
-
-**Image Storage:**
-- `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
-- `CLOUDINARY_API_KEY`: Your Cloudinary API key
-- `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
-
-**CORS:**
-- `CORS_ORIGINS`: Comma-separated list of allowed origins
-
-### Environment-Specific Notes
-
-**Local Development:**
-- Use `.env` file (not committed to git)
-- See `.env.example` for template
-
-**Render:**
-- Set in Render dashboard
-- Auto-generated for JWT_SECRET
-- Manual entry for other variables
-
-**Vercel:**
-- Frontend doesn't require environment variables
-- Backend (on Render) handles all environment config
+</div>

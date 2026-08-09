@@ -10,7 +10,7 @@ services:
       - key: PORT
         value: 8000
       - key: MONGO_URL
-        value: mongodb+srv://joshuaminasetiktok_db_user:UpnVT1kslerDysAl@megeb.5j2likp.mongodb.net/?appName=Megeb
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: GROQ_API_KEY
