@@ -334,6 +334,7 @@
 
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/dish-image.js"></script>
   <script src="js/ai-widget.js"></script>
   <script>
     updateNav();
@@ -369,7 +370,7 @@
       document.title = `Megeb — ${data.name}`;
 
       const heroImg = document.getElementById('hero-img');
-      heroImg.src = data.reference_image_url || 'images/food-doro.jpg';
+      heroImg.src = getDishImageSrc({ ...data, image_url: data.reference_image_url });
       heroImg.onerror = () => heroImg.src = 'images/food-doro.jpg';
       heroImg.alt = data.name;
       document.getElementById('hero-title').querySelector('h1').textContent = data.name;
@@ -479,7 +480,7 @@
     }
 
     function buildVariationHTML(v) {
-      const imgSrc = v.image_url || currentDish.reference_image_url || 'images/food-doro.jpg';
+      const imgSrc = getDishImageSrc({ ...currentDish, image_url: v.image_url || currentDish.reference_image_url });
       const meta = [
         v.prep_time_minutes && `⏱ Prep: ${v.prep_time_minutes} min`,
         v.cook_time_minutes && `🍳 Cook: ${v.cook_time_minutes} min`,
