@@ -275,7 +275,7 @@
         ).join('');
         return `
         <div class="food-item" onclick="window.location.href='recipe.html?slug=${d.slug}'">
-          <img src="${getDishImageSrc({ ...d, image_url: d.reference_image_url })}" alt="${d.name}" onerror="dishImageFallbackByName(this, '${(d.name || '').replace(/'/g, "\\'")}', '${d.category || ''}')">
+          <img src="${getDishImageSrc(d)}" alt="${d.name}" onerror="dishImageFallbackByName(this, '${(d.name||'').replace(/'/g, "\\'")}', '${d.category||''}')">
           <div class="var-badge ${badgeClass}">${badgeText}</div>
           <div class="food-item-body">
             <h3>${d.name}</h3>
@@ -336,7 +336,7 @@
         if (!items.length) { document.getElementById('trending-section').style.display='none'; return; }
         row.innerHTML = items.map(d => `
           <div class="trend-card" onclick="window.location.href='recipe.html?slug=${d.slug}'">
-            <img src="${getDishImageSrc({ ...d, image_url: d.reference_image_url })}" alt="${d.name}" onerror="dishImageFallbackByName(this, '${(d.name || '').replace(/'/g, "\\'")}', '${d.category || ''}')">
+            <img src="${getDishImageSrc(d)}" alt="${d.name}" onerror="dishImageFallbackByName(this, '${(d.name||'').replace(/'/g, "\\'")}', '${d.category||''}')">
             <div class="trend-card-body">
               <div class="trend-badge">🍽 ${d.variation_count||1} variation${(d.variation_count||1)>1?'s':''}</div>
               <h3>${d.name}</h3>
