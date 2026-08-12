@@ -480,7 +480,7 @@
     }
 
     function buildVariationHTML(v) {
-      const imgSrc = getDishImageSrc(currentDish, v.image_url);
+      const imgSrc = getDishImageSrc({ ...currentDish, image_url: v.image_url || currentDish.reference_image_url });
       const meta = [
         v.prep_time_minutes && `⏱ Prep: ${v.prep_time_minutes} min`,
         v.cook_time_minutes && `🍳 Cook: ${v.cook_time_minutes} min`,
