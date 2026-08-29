@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from models.schemas import GenerateRequest, SubstituteRequest
-from database import db as megeb_db
+from database import db as megeb_db, dishes
 
 # Don't call load_dotenv() here - it's already called in main.py
 # load_dotenv()
@@ -46,7 +46,8 @@ class ImageRequest(BaseModel):
 SYSTEM_FOOD = """You are Megeb's Ethiopian cooking assistant, grounded in the Gursha cookbook by Beejhy Barhany.
 The user will give you a list of ingredients they have at home.
 Your ONLY job is to suggest Ethiopian dishes they can make with those ingredients.
-List 2–4 matching Ethiopian recipes. For each one give: the dish name, a one-line description, and the key ingredients from their list that it uses.
+List 2–4 matching Ethiopian recipes. For each one give: the dish name (EXACTLY as it appears in the database), a one-line description, and the key ingredients from their list that it uses.
+Format as: **Dish Name** - Description (uses: ingredient1, ingredient2)
 If cookbook context is provided below, prefer those authentic recipes over general knowledge.
 If none of their ingredients match any Ethiopian dish, politely say so and suggest what common Ethiopian ingredients to add.
 Never suggest non-Ethiopian food."""
@@ -113,6 +114,18 @@ async def retrieve_rag_context(query: str) -> str:
     except Exception:
         # RAG is best-effort — never break the AI endpoint if it fails
         return ""
+
+
+async def find_dish_slug(dish_name: str) -> str:
+    """Search for a dish by name and return its slug if found."""
+    try:
+        dish = await dishes.find_one({"name": {"$regex": dish_name, "$options": "i"}})
+        if dish and "slug" in dish:
+            return dish["slug"]
+    except Exception:
+        pass
+    # Fallback: generate slug from dish name
+    return dish_name.lower().replace(" ", "-").replace("'", "-").replace("’", "-")
 
 
 async def call_groq(messages: list) -> str:
@@ -186,7 +199,22 @@ async def ai_chat(request: Request, body: ChatRequest):
             {"role": "system", "content": system_prompt},
             {"role": "user",   "content": body.message},
         ])
-        return {"reply": content}
+
+        # Post-process: convert dish names to clickable links
+        # Find dish names (marked with **bold**) and convert to links
+        lines = content.split('\n')
+        processed_lines = []
+        for line in lines:
+            # Find bold text patterns **Dish Name**
+            bold_matches = re.findall(r'\*\*([^*]+)\*\*', line)
+            for dish_name in bold_matches:
+                # Try to find the dish slug in database
+                slug = await find_dish_slug(dish_name.strip())
+                # Replace **Dish Name** with markdown link
+                line = line.replace(f'**{dish_name}**', f'[{dish_name}](recipe.html?slug={slug})')
+            processed_lines.append(line)
+
+        return {"reply": '\n'.join(processed_lines)}
     except HTTPException as e:
         # Return a graceful error message instead of throwing exception
         error_msg = "AI service temporarily unavailable. "

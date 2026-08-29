@@ -96,7 +96,17 @@
       });
       const data = await res.json();
 
-      result.textContent   = res.ok ? (data.reply || 'No suggestions found.') : (data.detail || data.message || '⚠️ AI service unavailable. Please try again later.');
+      // Parse markdown links and convert to HTML
+      let reply = data.reply || 'No suggestions found.';
+      if (res.ok) {
+        // Convert markdown links [text](url) to HTML links
+        reply = reply.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color: #FF9124; text-decoration: underline;">$1</a>');
+        // Convert bold markdown **text** to HTML strong
+        reply = reply.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      } else {
+        reply = data.detail || data.message || '⚠️ AI service unavailable. Please try again later.';
+      }
+      result.innerHTML   = reply;
       result.style.display = 'block';
     } catch (err) {
       console.error('AI Error:', err);

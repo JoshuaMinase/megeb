@@ -275,10 +275,10 @@
           btn.textContent = '✨ What can I cook?';
           return;
         }
-        const res  = await fetch(`${API_BASE_URL}/ai/generate`, {
+        const res  = await fetch(`${API_BASE_URL}/ai/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ingredients }),
+          body: JSON.stringify({ message: ingredients.join(', ') }),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -295,6 +295,18 @@
             data.recipe.servings  && `🍽 ${data.recipe.servings}`,
             data.recipe.nationality && `🌍 ${data.recipe.nationality}`,
           ].filter(Boolean).map(t => `<span>${t}</span>`).join('');
+          document.getElementById('ai-result').style.display = 'block';
+        } else if (data.reply) {
+          // Parse AI suggestions with links
+          let reply = data.reply;
+          // Convert markdown links [text](url) to HTML links
+          reply = reply.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color: #FF9124; text-decoration: underline;">$1</a>');
+          // Convert bold markdown **text** to HTML strong
+          reply = reply.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+          // Display as suggestions
+          document.getElementById('ar-name').textContent = 'Recipe Suggestions';
+          document.getElementById('ar-desc').innerHTML = reply;
+          document.getElementById('ar-meta').innerHTML = '';
           document.getElementById('ai-result').style.display = 'block';
         } else {
           alert('AI could not generate a recipe. Try adding more ingredients.');
