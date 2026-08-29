@@ -21,8 +21,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
-# Try multiple models in order of preference
-MODELS       = ["llama3-70b-8192", "llama3-8b-8192", "gemma2-9b-it"]
+# Current recommended models based on Groq deprecation docs (as of Aug 2026)
+MODELS       = ["openai/gpt-oss-120b", "qwen/qwen3.6-27b", "openai/gpt-oss-20b"]
 
 # Maximum characters of cookbook context to inject per request
 RAG_MAX_CONTEXT_CHARS = 2000
@@ -132,11 +132,11 @@ async def call_groq(messages: list) -> str:
             if resp.status_code == 200:
                 return resp.json()["choices"][0]["message"]["content"]
 
-            # If model not found, try next model
+            # If model not found or decommissioned, try next model
             if resp.status_code == 400 or resp.status_code == 404:
                 try:
                     err = resp.json().get("error", {}).get("message", resp.text)
-                    if "does not exist" in err or "not found" in err.lower():
+                    if "does not exist" in err or "not found" in err.lower() or "decommissioned" in err.lower():
                         continue  # Try next model
                 except Exception:
                     continue
