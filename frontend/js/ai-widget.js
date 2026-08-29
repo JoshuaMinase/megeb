@@ -96,7 +96,7 @@
       });
       const data = await res.json();
 
-      result.textContent   = res.ok ? (data.reply || 'No suggestions found.') : (data.message || '⚠️ AI service unavailable. Please check your API configuration.');
+      result.textContent   = res.ok ? (data.reply || 'No suggestions found.') : (data.detail || data.message || '⚠️ AI service unavailable. Please try again later.');
       result.style.display = 'block';
     } catch (err) {
       console.error('AI Error:', err);

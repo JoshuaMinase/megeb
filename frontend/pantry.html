@@ -282,11 +282,7 @@
         });
         const data = await res.json();
         if (!res.ok) {
-          const msg = res.status === 503
-            ? 'AI not configured — add GROQ_API_KEY to backend/.env'
-            : res.status === 429
-            ? 'Rate limit reached. Try again later.'
-            : 'AI is unavailable right now. Try again later.';
+          const msg = data.detail || data.message || 'AI is unavailable right now. Try again later.';
           alert(msg);
         } else if (data.recipe) {
           pendingAiRecipe = data.recipe;

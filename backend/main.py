@@ -166,6 +166,9 @@ async def debug_env():
     }
 
 
+
+
+
 uploads_path = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
