@@ -21,7 +21,7 @@ limiter = Limiter(key_func=get_remote_address)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
-MODEL        = "llama-3.1-8b-instant"   # free, fast
+MODEL        = "llama-3.3-70b-versatile"   # current Groq model
 
 # Maximum characters of cookbook context to inject per request
 RAG_MAX_CONTEXT_CHARS = 2000
