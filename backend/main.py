@@ -9,6 +9,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
+# Load .env file if it exists (for local development), but don't fail if it doesn't
 load_dotenv()
 
 # â”€â”€ Startup env validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -16,6 +17,7 @@ _REQUIRED = ["GROQ_API_KEY", "JWT_SECRET", "MONGO_URL"]
 _missing = [k for k in _REQUIRED if not os.environ.get(k)]
 if _missing:
     print(f"WARNING: Missing env vars: {', '.join(_missing)}. Some features may not work.")
+    print(f"Debug info - GROQ_API_KEY present: {bool(os.environ.get('GROQ_API_KEY'))}")
 
 from routes.auth_routes import router as auth_router
 from routes.recipe_routes import router as recipe_router
@@ -150,6 +152,18 @@ async def health():
     except Exception:
         db_ok = False
     return {"status": "ok", "db": db_ok}
+
+
+@app.get("/debug/env")
+async def debug_env():
+    """Debug endpoint to check environment variables (remove in production)"""
+    return {
+        "groq_api_key_set": bool(os.getenv("GROQ_API_KEY")),
+        "groq_api_key_length": len(os.getenv("GROQ_API_KEY", "")),
+        "mongo_url_set": bool(os.getenv("MONGO_URL")),
+        "jwt_secret_set": bool(os.getenv("JWT_SECRET")),
+        "cors_origins": os.getenv("CORS_ORIGINS", "not set"),
+    }
 
 
 uploads_path = os.path.join(os.path.dirname(__file__), "uploads")

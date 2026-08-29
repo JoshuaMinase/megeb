@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 import httpx
+from httpx import TimeoutException, RequestError
 import os
 from dotenv import load_dotenv
 from slowapi import Limiter
@@ -12,7 +13,8 @@ from slowapi.util import get_remote_address
 from models.schemas import GenerateRequest, SubstituteRequest
 from database import db as megeb_db
 
-load_dotenv()
+# Don't call load_dotenv() here - it's already called in main.py
+# load_dotenv()
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 limiter = Limiter(key_func=get_remote_address)
@@ -116,26 +118,31 @@ async def call_groq(messages: list) -> str:
     if not GROQ_API_KEY:
         raise HTTPException(503, "Groq API key not set. Add GROQ_API_KEY to backend/.env")
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(GROQ_URL, headers=_headers(), json={
-            "model": MODEL,
-            "messages": messages,
-            "temperature": 0.7,
-        })
-
-    if resp.status_code == 200:
-        return resp.json()["choices"][0]["message"]["content"]
-
     try:
-        err = resp.json().get("error", {}).get("message", resp.text)
-    except Exception:
-        err = resp.text
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(GROQ_URL, headers=_headers(), json={
+                "model": MODEL,
+                "messages": messages,
+                "temperature": 0.7,
+            })
 
-    if resp.status_code == 401:
-        raise HTTPException(401, "Invalid Groq API key.")
-    if resp.status_code == 429:
-        raise HTTPException(429, "Rate limit hit — try again in a moment.")
-    raise HTTPException(502, f"AI error: {err}")
+        if resp.status_code == 200:
+            return resp.json()["choices"][0]["message"]["content"]
+
+        try:
+            err = resp.json().get("error", {}).get("message", resp.text)
+        except Exception:
+            err = resp.text
+
+        if resp.status_code == 401:
+            raise HTTPException(401, "Invalid Groq API key.")
+        if resp.status_code == 429:
+            raise HTTPException(429, "Rate limit hit — try again in a moment.")
+        raise HTTPException(502, f"AI error: {err}")
+    except httpx.TimeoutException:
+        raise HTTPException(504, "AI service timeout. Please try again.")
+    except httpx.RequestError as e:
+        raise HTTPException(503, f"Cannot connect to AI service: {str(e)}")
 
 
 def _extract_json(content: str):
@@ -155,13 +162,24 @@ def _extract_json(content: str):
 @router.post("/chat")
 @limiter.limit("20/minute")
 async def ai_chat(request: Request, body: ChatRequest):
-    rag_context = await retrieve_rag_context(body.message)
-    system_prompt = SYSTEM_FOOD + rag_context
-    content = await call_groq([
-        {"role": "system", "content": system_prompt},
-        {"role": "user",   "content": body.message},
-    ])
-    return {"reply": content}
+    try:
+        rag_context = await retrieve_rag_context(body.message)
+        system_prompt = SYSTEM_FOOD + rag_context
+        content = await call_groq([
+            {"role": "system", "content": system_prompt},
+            {"role": "user",   "content": body.message},
+        ])
+        return {"reply": content}
+    except HTTPException as e:
+        # Return a graceful error message instead of throwing exception
+        error_msg = "AI service temporarily unavailable. "
+        if "Invalid API Key" in str(e.detail):
+            error_msg += "Please check your GROQ_API_KEY configuration."
+        elif "timeout" in str(e.detail).lower():
+            error_msg += "Request timed out. Please try again."
+        else:
+            error_msg += str(e.detail)
+        return {"reply": error_msg}
 
 
 @router.post("/image-recipe")
