@@ -96,9 +96,10 @@
       });
       const data = await res.json();
 
-      result.textContent   = res.ok ? (data.reply || 'No suggestions found.') : '⚠️ AI unavailable. Make sure GROQ_API_KEY is set in backend/.env';
+      result.textContent   = res.ok ? (data.reply || 'No suggestions found.') : (data.message || '⚠️ AI service unavailable. Please check your API configuration.');
       result.style.display = 'block';
-    } catch {
+    } catch (err) {
+      console.error('AI Error:', err);
       result.textContent   = 'Connection error — is the server running?';
       result.style.display = 'block';
     }

@@ -112,6 +112,20 @@ async function fetchDishes(params = {}) {
   return apiFetch(`/api/dishes${qs ? '?' + qs : ''}`);
 }
 
+// Simple cache for dishes to improve performance
+const dishesCache = new Map();
+async function fetchDishesWithCache(params = {}) {
+  const cacheKey = JSON.stringify(params);
+  if (dishesCache.has(cacheKey)) {
+    return dishesCache.get(cacheKey);
+  }
+  const result = await fetchDishes(params);
+  dishesCache.set(cacheKey, result);
+  // Clear cache after 5 minutes
+  setTimeout(() => dishesCache.delete(cacheKey), 5 * 60 * 1000);
+  return result;
+}
+
 async function fetchDish(slug) {
   return apiFetch(`/api/dishes/${slug}`);
 }

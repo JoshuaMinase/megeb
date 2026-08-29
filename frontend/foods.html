@@ -243,7 +243,7 @@
         if (activeCategory) params.category = activeCategory;
         if (activeDiet) params.diet = activeDiet;
 
-        const data = await fetchDishes(params);
+        const data = await fetchDishesWithCache(params);
         currentPage = page;
         totalPages = Math.ceil((data.total || 0) / PAGE_SIZE) || 1;
 
@@ -343,7 +343,10 @@
               <p>${d.description}</p>
             </div>
           </div>`).join('');
-      } catch(_) { document.getElementById('trending-section').style.display='none'; }
+      } catch(e) { 
+        console.error('Error loading trending:', e);
+        document.getElementById('trending-section').style.display='none'; 
+      }
     }
 
     const params = new URLSearchParams(window.location.search);

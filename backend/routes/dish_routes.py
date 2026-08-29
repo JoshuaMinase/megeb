@@ -32,7 +32,7 @@ async def trending_dishes(limit: int = Query(8, le=20)):
     pipeline = [
         {"$group": {"_id": "$dish_id", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
-        {"$limit": limit * 2},  # over-fetch to account for non-approved dishes
+        {"$limit": limit * 3},  # over-fetch more to account for non-approved dishes
         {
             "$lookup": {
                 "from": "dishes",
@@ -75,17 +75,31 @@ async def list_dishes(
     if diet:
         tags = [t.strip() for t in diet.split(",") if t.strip() in DIETARY_TAGS]
         if tags:
-            matching_vars = await recipe_variations.distinct(
-                "dish_id",
-                {"status": "approved", "dietary_tags": {"$all": tags}},
-            )
-            # distinct returns a mix of ObjectId and str — normalise to ObjectId only
+            # Optimized: use aggregation pipeline instead of distinct
+            pipeline = [
+                {"$match": {"status": "approved", "dietary_tags": {"$all": tags}}},
+                {"$group": {"_id": "$dish_id"}},
+                {"$project": {"_id": 1, "dish_id": "$_id"}}
+            ]
+            matching_vars = await recipe_variations.aggregate(pipeline).to_list(length=None)
+            
+            # Normalize to ObjectId only
             oid_set = set()
-            for did in matching_vars:
+            for doc in matching_vars:
+                did = doc.get("_id") or doc.get("dish_id")
                 s = str(did)
                 if ObjectId.is_valid(s):
                     oid_set.add(ObjectId(s))
-            query["_id"] = {"$in": list(oid_set)}
+            if oid_set:
+                query["_id"] = {"$in": list(oid_set)}
+            else:
+                # No matching dishes found
+                return {
+                    "dishes": [],
+                    "total": 0,
+                    "page": page,
+                    "pages": 1,
+                }
 
     skip = (page - 1) * limit
     total = await dishes.count_documents(query)
@@ -95,11 +109,13 @@ async def list_dishes(
     # Compute top_tags: for each dish, find the union of dietary_tags across approved variations
     if docs:
         dish_ids_str = [str(d["_id"]) for d in docs]
-        # Query variations matching by both str and ObjectId dish_id
+        dish_ids_obj = [d["_id"] for d in docs]
+        
+        # Optimized: single query with proper indexing
         tags_cursor = recipe_variations.find(
             {"$or": [
                 {"dish_id": {"$in": dish_ids_str}},
-                {"dish_id": {"$in": [d["_id"] for d in docs]}},
+                {"dish_id": {"$in": dish_ids_obj}},
             ], "status": "approved", "dietary_tags": {"$exists": True, "$ne": []}},
             {"dish_id": 1, "dietary_tags": 1},
         )
