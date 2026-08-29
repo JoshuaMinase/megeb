@@ -21,7 +21,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
-MODEL        = "llama-3.3-70b-versatile"   # current Groq model
+# Try multiple models in order of preference
+MODELS       = ["llama3-70b-8192", "llama3-8b-8192", "gemma2-9b-it"]
 
 # Maximum characters of cookbook context to inject per request
 RAG_MAX_CONTEXT_CHARS = 2000
@@ -118,31 +119,47 @@ async def call_groq(messages: list) -> str:
     if not GROQ_API_KEY:
         raise HTTPException(503, "Groq API key not set. Add GROQ_API_KEY to backend/.env")
 
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(GROQ_URL, headers=_headers(), json={
-                "model": MODEL,
-                "messages": messages,
-                "temperature": 0.7,
-            })
-
-        if resp.status_code == 200:
-            return resp.json()["choices"][0]["message"]["content"]
-
+    # Try each model in order until one works
+    for model in MODELS:
         try:
-            err = resp.json().get("error", {}).get("message", resp.text)
-        except Exception:
-            err = resp.text
+            async with httpx.AsyncClient(timeout=30) as client:
+                resp = await client.post(GROQ_URL, headers=_headers(), json={
+                    "model": model,
+                    "messages": messages,
+                    "temperature": 0.7,
+                })
 
-        if resp.status_code == 401:
-            raise HTTPException(401, "Invalid Groq API key.")
-        if resp.status_code == 429:
-            raise HTTPException(429, "Rate limit hit — try again in a moment.")
-        raise HTTPException(502, f"AI error: {err}")
-    except httpx.TimeoutException:
-        raise HTTPException(504, "AI service timeout. Please try again.")
-    except httpx.RequestError as e:
-        raise HTTPException(503, f"Cannot connect to AI service: {str(e)}")
+            if resp.status_code == 200:
+                return resp.json()["choices"][0]["message"]["content"]
+
+            # If model not found, try next model
+            if resp.status_code == 400 or resp.status_code == 404:
+                try:
+                    err = resp.json().get("error", {}).get("message", resp.text)
+                    if "does not exist" in err or "not found" in err.lower():
+                        continue  # Try next model
+                except Exception:
+                    continue
+
+            # For other errors, try to parse and raise
+            try:
+                err = resp.json().get("error", {}).get("message", resp.text)
+            except Exception:
+                err = resp.text
+
+            if resp.status_code == 401:
+                raise HTTPException(401, "Invalid Groq API key.")
+            if resp.status_code == 429:
+                raise HTTPException(429, "Rate limit hit — try again in a moment.")
+            raise HTTPException(502, f"AI error: {err}")
+
+        except httpx.TimeoutException:
+            continue  # Try next model on timeout
+        except httpx.RequestError as e:
+            continue  # Try next model on connection error
+
+    # If all models failed
+    raise HTTPException(502, "AI service unavailable. All models failed to respond.")
 
 
 def _extract_json(content: str):
